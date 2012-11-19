@@ -3078,47 +3078,21 @@ static DVP_U32 DVP_KernelGraphManager_CPU(DVP_KernelNode_t *pSubNodes, DVP_U32 s
                 {
                     DVP_ImageConvolution_t *pImg = dvp_knode_to(&pSubNodes[n], DVP_ImageConvolution_t);
                     DVP_U32  filterSize = 3;
-                    DVP_U32  newheight = pImg->input.height -(filterSize -1);
+                    DVP_U32  newheight = pImg->input.height - (filterSize -1);
                     DVP_U08* in  = pImg->input.pData[0];
                     DVP_U08* out = pImg->output.pData[0];
                     DVP_U32 y;
-                    if((int)pImg->input.width == pImg->input.y_stride)
-                    {
-                        for(i=0; i<newheight; i++)
-                        {
-                            IMG_conv_3x3_i8_c8s(in,
-                                                out,
-                                                (short)pImg->input.width,
-                                                (short)pImg->input.y_stride,
-                                                (const char*)pImg->mask.pData[0],
-                                                (int)pImg->shiftMask);
-                            in += pImg->input.y_stride;
-                            out += pImg->output.y_stride;
-                        }
-                    }else
-                    {
-                        DVP_U08 *tmpBuf = (DVP_U08 *)malloc(pImg->input.width * (16 + (filterSize -1)));
-                        DVP_U08 blockHeight = 16;
-                        for(y=0; y<newheight; y+=blockHeight)
-                        {
-                            if(y+blockHeight > newheight)
-                                blockHeight = newheight-y;
 
-                            for(i=0; i<(blockHeight + (filterSize -1)); i++)
-                                memcpy(&tmpBuf[i*pImg->input.width], &pImg->input.pData[0][(y+i)*pImg->input.y_stride], pImg->input.width);
-
-                            for(i=0; i<blockHeight; i++)
-                            {
-                                IMG_conv_3x3_i8_c8s(&tmpBuf[i*pImg->input.width],
-                                                    out,
-                                                    (short)pImg->input.width,
-                                                    (short)pImg->input.y_stride,
-                                                    (const char*)pImg->mask.pData[0],
-                                                    (int)pImg->shiftMask);
-                                out += pImg->output.y_stride;
-                            }
-                        }
-                        free(tmpBuf);
+                    for(i=0; i<newheight; i++)
+                    {
+                        IMG_conv_3x3_i8_c8s(in,
+                                            out,
+                                            (short)pImg->input.width,
+                                            (short)pImg->input.y_stride,
+                                            (const char*)pImg->mask.pData[0],
+                                            (int)pImg->shiftMask);
+                        in += pImg->input.y_stride;
+                        out += pImg->output.y_stride;
                     }
 
                     break;

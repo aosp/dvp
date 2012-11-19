@@ -6901,7 +6901,7 @@ status_e TestVisionEngine::Test_RVM()
             }
             fclose(calib);
             DVP_PRINT(DVP_ZONE_ENGINE, "Generating file %s for rvm LUT input!\n",lut_file);
-            sprintf(system_command, "rvm_generate_lut %d %d %d %d %d raw/rvm_calib_%dx%d_to_%dx%d.txt raw/rvm_lut_%dx%d_to_%dx%d_BL%d.bin",
+            sprintf(system_command, "rvm_generate_lut %d %d %d %d %d raw/rvm_calib_%dx%d_to_%dx%d.txt raw/rvm_lut_%dx%d_to_%dx%d_BL%d.bin -ORDERED_OUTPUT",
                 m_width, m_height, m_width, m_height, blockSize,
                 m_width, m_height, m_width, m_height,
                 m_width, m_height, m_width, m_height, blockSize);

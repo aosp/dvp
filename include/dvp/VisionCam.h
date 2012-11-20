@@ -792,6 +792,33 @@ typedef struct hms_gamma_data_type {
     uint8_t data[1];
 } VisionCamGamma;
 
+/**
+ *  Structure describes properties of one level in image pyramid
+ *  nOffset : nOffset from start of buffer in bytes
+ *  nWidth  : nWidth  in pixels
+ *  nHeight : nHeight in pixels
+ *  nStride : nStride in bytes
+ */
+typedef struct _vcam_image_pyramid_item_t {
+    uint32_t    nOffset;
+    uint16_t    nWidth;
+    uint16_t    nHeight;
+    uint32_t    nStride;
+} VisionCamImagePyramidItem_t;
+
+/**
+ *  The extra data that stores image pyramid data,
+ *  It is described with the following structure.
+ *  nLevelsCount - Number of levels of pyramid
+ *  PyramidData - first element of the array that contains
+ *  description of each level of pyramid.
+ *  Size of the array is defined by nLevelsCount.
+ */
+typedef struct _vcam_image_pyramid_data_t {
+    uint32_t                    nLevelsCount;
+    VisionCamImagePyramidItem_t PyramidData[1];
+} VisionCamImagePyramidData;
+
 /** @struct VisionCamMetadata
   * Image meta data type definition.
 */
@@ -810,6 +837,8 @@ typedef struct _metadata_type {
     VisionCamUnsaturatedRegions *mUnsaturatedRegions;
     VisionCamMTIS               *mMTIS_Data;
     VisionCamFocusRegion        *mFocusRegionData;
+
+    VisionCamImagePyramidData   *mImgPyramidData;
 
 }VisionCamMetadata;
 

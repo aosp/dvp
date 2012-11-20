@@ -1613,7 +1613,7 @@ status_e OMXVisionCam::setBrightness(void *param, size_t size __attribute__ ((un
     OMX_CONFIG_BRIGHTNESSTYPE brightness;
     brightness.nSize = sizeof(OMX_CONFIG_BRIGHTNESSTYPE);
     brightness.nBrightness = *((uint32_t*)param);
-    memcpy( &brightness.nVersion, mLocalVersion, sizeof(mLocalVersion) );
+    memcpy( &brightness.nVersion, mLocalVersion, sizeof(OMX_VERSIONTYPE) );
 
     int32_t p = port;
 //            LOOP_PORTS( port , p )
@@ -1632,7 +1632,7 @@ status_e OMXVisionCam::setContrast(void *param, size_t size __attribute__ ((unus
     OMX_CONFIG_CONTRASTTYPE contrast;
     contrast.nSize = sizeof( OMX_CONFIG_CONTRASTTYPE );
     contrast.nContrast = *((int32_t*)param);
-    memcpy( &contrast.nVersion, mLocalVersion, sizeof(mLocalVersion) );
+    memcpy( &contrast.nVersion, mLocalVersion, sizeof(OMX_VERSIONTYPE) );
 
     int32_t p = port;
 //            LOOP_PORTS( port , p )
@@ -1649,7 +1649,7 @@ status_e OMXVisionCam::setSharpness(void *param, size_t size __attribute__ ((unu
     OMX_IMAGE_CONFIG_PROCESSINGLEVELTYPE procSharpness;
     procSharpness.nSize = sizeof( OMX_IMAGE_CONFIG_PROCESSINGLEVELTYPE );
     procSharpness.nLevel = *((int32_t*)param);
-    memcpy( &procSharpness.nVersion, mLocalVersion, sizeof(mLocalVersion) );
+    memcpy( &procSharpness.nVersion, mLocalVersion, sizeof(OMX_VERSIONTYPE) );
 
     if( procSharpness.nLevel == 0 )
         procSharpness.bAuto = OMX_TRUE;
@@ -1672,7 +1672,7 @@ status_e OMXVisionCam::setSaturation(void *param, size_t size __attribute__ ((un
     OMX_CONFIG_SATURATIONTYPE saturation;
     saturation.nSize = sizeof(OMX_CONFIG_SATURATIONTYPE);
     saturation.nSaturation = *((int32_t*)param);
-    memcpy( &saturation.nVersion, mLocalVersion, sizeof(mLocalVersion) );
+    memcpy( &saturation.nVersion, mLocalVersion, sizeof(OMX_VERSIONTYPE) );
 
     int32_t p = port;
 //            LOOP_PORTS( port , p )
@@ -1734,7 +1734,7 @@ status_e OMXVisionCam::setImagePyramid(void *param, size_t size, VisionCamPort_e
         return STATUS_INVALID_PARAMETER;
     }
 
-    memcpy( &imagePyramid.nVersion, mLocalVersion, sizeof(mLocalVersion) );
+    memcpy( &imagePyramid.nVersion, mLocalVersion, sizeof(OMX_VERSIONTYPE) );
     imagePyramid.nSize          = sizeof( OMX_TI_PARAM_IMAGEPYRAMIDTYPE );
     imagePyramid.nPortIndex     = mCurGreContext.mPortsInUse[port];
     imagePyramid.nLevelsCount   = ((VisionCamImagePyramidType *)param)->mLevelsCount;
@@ -1767,7 +1767,7 @@ status_e OMXVisionCam::getImagePyramid(void *param, size_t size, VisionCamPort_e
         return STATUS_INVALID_PARAMETER;
     }
 
-    memcpy( &imagePyramid.nVersion, mLocalVersion, sizeof(mLocalVersion) );
+    memcpy( &imagePyramid.nVersion, mLocalVersion, sizeof(OMX_VERSIONTYPE) );
     imagePyramid.nSize          = sizeof( OMX_TI_PARAM_IMAGEPYRAMIDTYPE );
     imagePyramid.nPortIndex     = mCurGreContext.mPortsInUse[port];
 
@@ -1828,7 +1828,7 @@ status_e OMXVisionCam::setFlicker(void *param, size_t size __attribute__ ((unuse
 
     OMX_CONFIG_FLICKERCANCELTYPE flicker;
     flicker.nSize = sizeof( OMX_CONFIG_FLICKERCANCELTYPE );
-    memcpy( &flicker.nVersion, mLocalVersion, sizeof(mLocalVersion) );
+    memcpy( &flicker.nVersion, mLocalVersion, sizeof(OMX_VERSIONTYPE) );
     flicker.eFlickerCancel = *(OMX_COMMONFLICKERCANCELTYPE *)param;
 
     int32_t p = port;
@@ -1851,7 +1851,7 @@ status_e OMXVisionCam::setCrop(void *param, size_t size __attribute__ ((unused))
     crop.nTop = ((VisionCamRectType*)param)->mTop;
     crop.nWidth = ((VisionCamRectType*)param)->mWidth;
     crop.nHeight = ((VisionCamRectType*)param)->mHeight;
-    memcpy( &crop.nVersion,  mLocalVersion, sizeof(mLocalVersion) );
+    memcpy( &crop.nVersion,  mLocalVersion, sizeof(OMX_VERSIONTYPE) );
 
     int32_t p = port;
 //            LOOP_PORTS( port , p )
@@ -1879,7 +1879,7 @@ status_e OMXVisionCam::setStereoInfo(void *param, size_t size, VisionCamPort_e p
 #ifndef USE_VSTAB_FOR_STEREO
     OMX_CONFIG_BOOLEANTYPE vssEnable;
     vssEnable.nSize = sizeof(OMX_CONFIG_BOOLEANTYPE);
-    memcpy(&vssEnable.nVersion, mLocalVersion, sizeof(mLocalVersion));
+    memcpy(&vssEnable.nVersion, mLocalVersion, sizeof(OMX_VERSIONTYPE));
 #endif
 
     if ( info && size == sizeof(VisionCamStereoInfo))
@@ -2024,7 +2024,7 @@ status_e OMXVisionCam::setCameraOperatingMode(void *param, size_t size __attribu
         int value = 0;
         OMX_CONFIG_CAMOPERATINGMODETYPE opMode;
         opMode.nSize = sizeof( OMX_CONFIG_CAMOPERATINGMODETYPE );
-        memcpy( &opMode.nVersion, mLocalVersion, sizeof(mLocalVersion) );
+        memcpy( &opMode.nVersion, mLocalVersion, sizeof(OMX_VERSIONTYPE) );
 
         value = getLutValue(mode, VCAM_VALUE_TYPE, CaptureModeLUT, ARR_SIZE(CaptureModeLUT) );
 
@@ -2126,7 +2126,7 @@ status_e OMXVisionCam::setExposureCompensation(void * param, size_t size __attri
     OMX_CONFIG_EXPOSUREVALUETYPE expValues;
     OMX_STRUCT_INIT(expValues, OMX_CONFIG_EXPOSUREVALUETYPE, mLocalVersion);
 
-    memcpy( &expValues.nVersion , mLocalVersion , sizeof( *mLocalVersion ) );
+    memcpy( &expValues.nVersion , mLocalVersion , sizeof(OMX_VERSIONTYPE) );
     omxError = OMX_GetConfig( mCurGreContext.mHandleComp , OMX_IndexConfigCommonExposureValue , &expValues );
     vcamError = ConvertError(omxError);
 
@@ -2753,7 +2753,7 @@ status_e OMXVisionCam::startCollectingMaual3AParams(void* param, uint32_t size, 
 status_e OMXVisionCam::setManual3AParam(void* param, uint32_t size, VisionCamPort_e port)
 {
     VisionCam_3Asettings_Base_t* p = (VisionCam_3Asettings_Base_t* )param;
-    status_e vcamError = m3A_Export.set( p->eParamType, p->pData, sizeof(p->pData) );
+    status_e vcamError = m3A_Export.set( p->eParamType, p->pData, size );
 
     if( !m3A_Export.isHeld() && STATUS_SUCCESS == vcamError )
     {
@@ -4092,6 +4092,15 @@ void OMXVisionCam::getMetadataPtrs( VisionCamFrame *frame)
                 break;
             }
 #endif
+            case OMX_TI_ImagePyramid:
+            {
+                OMX_TI_IMAGEPYRAMIDTYPE     *pyramidData = NULL;
+                DVP_PRINT(DVP_ZONE_CAM, "METADATA: found Image Pyramid Data Section!\n" );
+                pyramidData = (OMX_TI_IMAGEPYRAMIDTYPE*)(extraData->data);
+                frame->mMetadata.mImgPyramidData = (VisionCamImagePyramidData*)(&pyramidData->nLevelsCount);
+                break;
+            }
+
 
 //            case OMX_FaceDetection:
             // done in getFacesCoordinates()
@@ -4279,7 +4288,7 @@ status_e OMXVisionCam::PreemptionService(/*VisionCamPreemptionActivity_e activit
 
                     pBufferHdr->nSize = sizeof(OMX_BUFFERHEADERTYPE);
 
-                    memcpy( &(pBufferHdr->nVersion), mLocalVersion, sizeof( OMX_VERSIONTYPE ) );
+                    memcpy( &(pBufferHdr->nVersion), mLocalVersion, sizeof(OMX_VERSIONTYPE) );
 
                     portData->mBufferHeader[buff] = pBufferHdr;
                 }

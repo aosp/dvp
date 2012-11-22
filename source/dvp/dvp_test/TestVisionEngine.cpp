@@ -3380,7 +3380,7 @@ status_e TestVisionEngine::Test_TeslaGraphSetup()
 #define sD_4x6 (6)
 #define mD_4x6 (2)
 #define SimplexN    3
-#define MAX_S32_S 2147483648
+#define MAX_S32_S 2147483647
 #define MAX_4p27 16
 #define HIST_ND_DIMX    4
     // DECLARE AND INITIALIZE MIXTURE OF GAUSSIANS PARAMETERS

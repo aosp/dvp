@@ -780,7 +780,7 @@ status_e dvp_query_kernel_test(void)
     DVP_Handle dvp = DVP_KernelGraph_Init();
     if( dvp )
     {
-        DVP_S32 feature_ends_at[] = {
+        DVP_U32 feature_ends_at[] = {
             DVP_KN_BGR3_TO_IYUV,
             DVP_KN_PREWITT_8,
             DVP_KN_ERODE_SQUARE,
@@ -803,7 +803,7 @@ status_e dvp_query_kernel_test(void)
                 memset(present, (DVP_FALSE - 1), sizeof(present)   );
                 memset(check,   (DVP_FALSE - 1), sizeof(check)     );
                 DVP_QueryKernel(dvp, kernel, present);
-                int i;
+                DVP_U32 i;
                 for( i = 0; i < dimof(present) ; i++ )
                 {
                     if( DVP_TRUE == present[i] ) {
@@ -1071,8 +1071,9 @@ status_e dvp_img_copy_test(void)
 
             if ( DVP_Image_Alloc(dvp, dstImage, DVP_MTYPE_DEFAULT) )
             {
-                DVP_S32 i, fromInd = -1, toInd = -1;
-                for( i = 0; i < dimof(color_name_table); i++ )
+                DVP_U32 i;
+                DVP_S32 fromInd = -1, toInd = -1;
+                for( i = 0u; i < dimof(color_name_table); i++ )
                 {
                     if( color_name_table[i].colorID == img_copy_conversions[copyCnt].from )
                         fromInd = i;
@@ -1122,8 +1123,10 @@ status_e dvp_img_copy_test(void)
         }
     }
 
+#ifdef DVP_DEBUG
     DVP_S32 avg = (success * 100) / (success + fail);
     DVP_PRINT(DVP_ZONE_ALWAYS,  "DVP_Image_Print() has ended with average success of %d %% \n", avg);
+#endif // DVP_DEGBUG
 
     if( dvp )
         DVP_KernelGraph_Deinit(dvp);
@@ -1592,14 +1595,14 @@ typedef struct _dvp_unittest_t {
 
 dvp_unittest_t unittests[] = {
     {STATUS_FAILURE, "Framework: Context", dvp_context_test},
-    {STATUS_FAILURE, "Framework: Query System", dvp_info_test},//
-    {STATUS_FAILURE, "Framework: CPU Nop Test", dvp_cpu_nop_test},//
+    {STATUS_FAILURE, "Framework: Query System", dvp_info_test},
+    {STATUS_FAILURE, "Framework: CPU Nop Test", dvp_cpu_nop_test},
     {STATUS_FAILURE, "Framework: SERIAL Nop Test", dvp_serial_nop_test},
     {STATUS_FAILURE, "Framework: PARALLEL Nop Test", dvp_parallel_nop_test},
     {STATUS_FAILURE, "Framework: SERIAL Copy Test", dvp_copy_test},
     {STATUS_FAILURE, "Framework: CUSTOM Copy Test", dvp_custom_copy_test},
 #if defined(DVP_USE_YUV)
-    {STATUS_FAILURE, "Framework: PARALLEL CC Test", dvp_split_cc_test},//
+    {STATUS_FAILURE, "Framework: PARALLEL CC Test", dvp_split_cc_test},
 #endif
     {STATUS_FAILURE, "Framework: ImageShift", dvp_imageshift_test},
     {STATUS_FAILURE, "Framework: Core Capacity Test", dvp_capacity_test },

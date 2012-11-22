@@ -29,7 +29,7 @@
 
 #define ARR_SIZE(arr) (sizeof(arr)/sizeof(arr[0]))
 
-static int NUM_BUFFERS = 5;
+const int NUM_BUFFERS = 5;
 const int NUM_BUFFERS_MAX = 8;
 
 /** Menu entry used in menuEntries
@@ -127,8 +127,6 @@ void deallocVideoPortBufers();
 status_e startServices( VisionCam * gCam );
 status_e stopServices( VisionCam * gCam );
 
-static void *notificationHandler(VisionCamClientNotifier::VisionCamClientNotificationMsg);
-
 void setInitialValues( VisionCam * gCam );
 entryIndex Menu( const menuEnrty ** menu );
 entryIndex getEntryIndex( const menuEnrty ** menu , entryKey desc );
@@ -136,8 +134,10 @@ status_e executeEntry( const menuEnrty *choice, VisionCam * gCam );
 bool checkValue( const definitionValues * defVal, int value);
 int getValue( const menuEnrty *choice );
 
-static void sendBufferTo_V4L(VisionCamFrame *cameraFrame);
-static void receiveFramePackage(VisionCamFramePack *pack);
+void *notificationHandler(VisionCamClientNotifier::VisionCamClientNotificationMsg);
+void sendBufferTo_V4L(VisionCamFrame *cameraFrame);
+void receiveFramePackage(VisionCamFramePack *pack);
+
 void drawFaceBox(VisionCamFrame *cameraFrame);
 int getBytesPerPixel();
 #endif /// __VCAM_TEST_TYPES__

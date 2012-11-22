@@ -37,6 +37,12 @@ DVP_U08 line_buf[4096];
 void DVP_KernelGraphCompleted(void *cookie, DVP_KernelGraph_t *graph, DVP_U32 sectionIndex, DVP_U32 numNodesExecuted)
 {
     DVP_PRINT(DVP_ZONE_ALWAYS, "TEST: {%p} Graph %p Section [%u] completed %u of %u nodes\n", cookie, graph, sectionIndex, numNodesExecuted, graph->sections[sectionIndex].numNodes);
+#ifndef DVP_DEBUG
+    cookie = cookie;
+    graph = graph;
+    sectionIndex = sectionIndex;
+    numNodesExecuted = numNodesExecuted;
+#endif
     return;
 }
 

@@ -142,11 +142,23 @@ status_e allocPreviewPortBuffers(VisionCam *vCam, uint32_t width, uint32_t heigh
     res.mWidth = VisionCamResolutions[prevResIdx].mWidth;
     res.mResIdx = (VisionCamResolIdex)prevResIdx;
 
+    uint32_t *disp_width, *disp_height;
+    if( true_e == show_whole_buffer )
+    {
+        disp_width = &res.mWidth;
+        disp_height = &res.mHeight;
+    }
+    else
+    {
+        disp_width = &width;
+        disp_height = &height;
+    }
+
     vCam->getParameter(VCAM_PARAM_2DBUFFER_DIM, &res, sizeof(res), VCAM_PORT_PREVIEW);
 
     if( !dvpd[VCAM_PORT_PREVIEW] )
     {
-        dvpd[VCAM_PORT_PREVIEW] = DVP_Display_Create(res.mWidth, res.mHeight , //width, height,
+        dvpd[VCAM_PORT_PREVIEW] = DVP_Display_Create(*disp_width, *disp_height,
                                   res.mWidth, res.mHeight,
                                   DVP_DISPLAY_WIDTH, DVP_DISPLAY_HEIGHT,
                                   res.mWidth, res.mHeight,
@@ -215,26 +227,36 @@ status_e allocVideoPortBuffers(VisionCam *vCam, uint32_t width, uint32_t height)
     status_e ret = STATUS_SUCCESS;
 
     VisionCamResType res;
-    if( VisionCamResolutions[max_video_port_resolution].mHeight < height
-            || VisionCamResolutions[max_video_port_resolution].mWidth < width)
-    {
-        res.mHeight = VisionCamResolutions[max_video_port_resolution].mHeight;
-        res.mWidth = VisionCamResolutions[max_video_port_resolution].mWidth;
-        res.mResIdx = (VisionCamResolIdex)max_video_port_resolution;
-    }
-    else
+//    if( VisionCamResolutions[max_video_port_resolution].mHeight < height
+//            || VisionCamResolutions[max_video_port_resolution].mWidth < width)
+//    {
+//        res.mHeight = VisionCamResolutions[max_video_port_resolution].mHeight;
+//        res.mWidth = VisionCamResolutions[max_video_port_resolution].mWidth;
+//        res.mResIdx = (VisionCamResolIdex)max_video_port_resolution;
+//    }
+//    else
     {
         res.mHeight = height;
         res.mWidth = width;
         res.mResIdx = (VisionCamResolIdex)prevResIdx;
     }
+    uint32_t *disp_width, *disp_height;
+    if( true_e == show_whole_buffer )
+    {
+        disp_width = &res.mWidth;
+        disp_height = &res.mHeight;
+    }
+    else
+    {
+        disp_width = &width;
+        disp_height = &height;
+    }
 
     vCam->getParameter(VCAM_PARAM_2DBUFFER_DIM, &res, sizeof(res), VCAM_PORT_VIDEO);
 
-    printf("res.mWidth, res.mHeight %d , %d \n", res.mWidth, res.mHeight);
     if( !dvpd[VCAM_PORT_VIDEO] )
     {
-        dvpd[VCAM_PORT_VIDEO] = DVP_Display_Create(res.mWidth, res.mHeight , //width, height,
+        dvpd[VCAM_PORT_VIDEO] = DVP_Display_Create(*disp_width, *disp_height,
                                   res.mWidth, res.mHeight,
                                   DVP_DISPLAY_WIDTH, DVP_DISPLAY_HEIGHT,
                                   res.mWidth, res.mHeight,
@@ -464,7 +486,7 @@ status_e stopServices( VisionCam * vCam )
     return result;
 }
 
-void *notificationHandler( VisionCamClientNotifier::VisionCamClientNotificationMsg msg )
+void *notificationHandler(VisionCamClientNotifier::VisionCamClientNotificationMsg msg)
 {
     void *ret = NULL;
 
@@ -1270,7 +1292,7 @@ void setDislpayableFrame(void *vCam __attribute__((unused)))
     /**((int*)e.localValue) = */getValue(&e);
 }
 
-static void sendBufferTo_V4L(VisionCamFrame *cameraFrame)
+void sendBufferTo_V4L(VisionCamFrame *cameraFrame)
 {
     DVP_Image_t *pImage = (DVP_Image_t *)cameraFrame->mFrameBuff;
     static int32_t frameCount[VCAM_PORT_MAX - VCAM_PORT_MIN] = {0};
@@ -1405,7 +1427,7 @@ static void sendBufferTo_V4L(VisionCamFrame *cameraFrame)
         }
 #endif
 
-#ifdef GRE_DEBUG_FILEOUT
+#ifdef DVP_DEBUG_FILEOUT
     if( cameraFrame->mExtraDataBuf )
     {
         static int cur = 1;
@@ -1427,7 +1449,7 @@ static void sendBufferTo_V4L(VisionCamFrame *cameraFrame)
     ((VisionCam *)cameraFrame->mContext)->returnFrame(cameraFrame);
 }
 
-static void receiveFramePackage(VisionCamFramePack *pack)
+void receiveFramePackage(VisionCamFramePack *pack)
 {
     VisionCamFrame *frame = NULL;
     DVP_Image_t *pImage = NULL;

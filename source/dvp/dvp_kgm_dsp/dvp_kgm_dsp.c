@@ -54,41 +54,59 @@
 
 #define KGM_TAG "DVP KGM DSP"
 
+#if (defined(DVP_USE_IMGLIB) || defined(DVP_USE_VLIB))
 static dvp_image_shift_t dsp_shift3 = {
     -1, -1, 0, 2, 2, 0,
 };
+#endif
 
+#if (defined(DVP_USE_IMGLIB) || defined(DVP_USE_VLIB))
 static dvp_image_shift_t dsp_shift5 = {
     -2, -2, 0, 4, 4, 0,
 };
+#endif
 
+#if (defined(DVP_USE_IMGLIB) /*|| defined(DVP_USE_VLIB)*/)
 static dvp_image_shift_t dsp_shift7 = {
     -3, -3, 0, 6, 6, 0,
 };
+#endif
 
+#if (defined(DVP_USE_IMGLIB) /*|| defined(DVP_USE_VLIB)*/)
 static dvp_image_shift_t dsp_shift8 = {
     -4, -4, 0, 7, 7, 0,
 };
+#endif
 
+#if (defined(DVP_USE_IMGLIB) /*|| defined(DVP_USE_VLIB)*/)
 static dvp_image_shift_t dsp_shift11 = {
     -5, -5, 0, 10, 10, 0,
 };
+#endif
 
+#if (defined(DVP_USE_IMGLIB) /*|| defined(DVP_USE_VLIB)*/)
 static dvp_image_shift_t dsp_shift16 = {
     -8, -8, 0, 15, 15, 0,
 };
+#endif
 
+#if (defined(DVP_USE_VLIB) /*|| defined(DVP_USE_IMGLIB) */)
 static dvp_image_shift_t dsp_nonmax_shift3 = {
     -1, 1, 2, 2, 0, 0,
 };
+#endif
 
+#if (defined(DVP_USE_VLIB) /*|| defined(DVP_USE_IMGLIB) */)
 static dvp_image_shift_t dsp_nonmax_shift5 = {
     -2, 2, 4, 4, 0, 0,
 };
+#endif
 
+#if (defined(DVP_USE_VLIB) /*|| defined(DVP_USE_IMGLIB) */)
 static dvp_image_shift_t dsp_nonmax_shift7 = {
     -3, 3, 6, 6, 0, 0,
 };
+#endif
 
 static DVP_CoreFunction_t remote_kernels[] = {
 #ifdef DVP_USE_IPC

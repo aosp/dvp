@@ -59,6 +59,8 @@ static VisionCamPort_e currentPort = VCAM_PORT_ALL;
 static bool faceDetectEnabled = false;
 static VisionCamVarFramerateType varFrate;
 
+static bool_e show_whole_buffer = true_e;
+
 //static VisionCamPort_e framesDisplayed = VCAM_PORT_PREVIEW;
 #ifdef CAP_FRAME
 static bool recNextFrame = false;

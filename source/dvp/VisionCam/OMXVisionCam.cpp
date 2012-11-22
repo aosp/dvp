@@ -360,7 +360,8 @@ bool_e OMXVisionCam::initParameterSetters()
 
         ret = registerParameterSetters(checkTable);
 
-        for( int32_t i = 0; i < dimof(checkTable); i++ )
+#ifdef DVP_DEBUG
+        for( uint32_t i = 0; i < dimof(checkTable); i++ )
         {
             if( checkTable[i] != true_e )
             {
@@ -368,6 +369,8 @@ bool_e OMXVisionCam::initParameterSetters()
                 DVP_PRINT(DVP_ZONE_ALWAYS, "Failed to register setter function for parameter with ID %d ( 0x%x )", paramId, paramId);
             }
         }
+#endif // DVP_DEBUG
+
     }
     else
     {
@@ -430,7 +433,7 @@ bool_e OMXVisionCam::registerParameterSetters( bool_e *checkTable )
         FILL_CHECK_TABLE(VCAM_PARAM_ROTATION)               = mSetParameterExecutor->Register( VCAM_PARAM_ROTATION              , &OMXVisionCam::setFormatRotation       , sizeof(int32_t)                  );
 #else
         FILL_CHECK_TABLE(VCAM_PARAM_ROTATION)               = mSetParameterExecutor->Register( VCAM_PARAM_ROTATION              , &OMXVisionCam::setPreviewRotation      , sizeof(int32_t)                  );
-#endif VCAM_SET_FORMAT_ROTATION
+#endif // VCAM_SET_FORMAT_ROTATION
 
 #ifdef EXPORTED_3A
         FILL_CHECK_TABLE(VCAM_PARAM_EXPORTED_3A_HOLD)       = mSetParameterExecutor->Register( VCAM_PARAM_EXPORTED_3A_HOLD      , &OMXVisionCam::startCollectingMaual3AParams   , 0                         );
@@ -2562,7 +2565,7 @@ status_e OMXVisionCam::_3A_ApplyExported()
 }
 #endif
 
-status_e OMXVisionCam::setPreviewHeight(void* param, uint32_t size, VisionCamPort_e port)
+status_e OMXVisionCam::setPreviewHeight(void* param, uint32_t size __attribute__((unused)), VisionCamPort_e port)
 {
     int32_t p;
     LOOP_PORTS( port , p )
@@ -2570,7 +2573,7 @@ status_e OMXVisionCam::setPreviewHeight(void* param, uint32_t size, VisionCamPor
     return STATUS_SUCCESS;
 }
 
-status_e OMXVisionCam::setPreaviewWidth(void* param, uint32_t size, VisionCamPort_e port)
+status_e OMXVisionCam::setPreaviewWidth(void* param, uint32_t size __attribute__ ((unused)), VisionCamPort_e port)
 {
     int32_t p;
     LOOP_PORTS( port , p )
@@ -2578,19 +2581,19 @@ status_e OMXVisionCam::setPreaviewWidth(void* param, uint32_t size, VisionCamPor
     return STATUS_SUCCESS;
 }
 
-status_e OMXVisionCam::startAutoFocus(void* param, uint32_t size, VisionCamPort_e port)
+status_e OMXVisionCam::startAutoFocus(void* param, uint32_t size __attribute__ ((unused)), VisionCamPort_e port __attribute__ ((unused)))
 {
     return startAutoFocus( *((VisionCamFocusMode*)param) );
 }
 
-status_e OMXVisionCam::startManualFocus(void* param, uint32_t size, VisionCamPort_e port)
+status_e OMXVisionCam::startManualFocus(void* param, uint32_t size __attribute__ ((unused)), VisionCamPort_e port __attribute__ ((unused)))
 {
     mManualFocusDistance = *((uint32_t*)param);
     return startAutoFocus( VCAM_FOCUS_CONTROL_ON );
 }
 
 #ifndef EXPORTED_3A
-status_e OMXVisionCam::setWBalColorGains(void* param, uint32_t size, VisionCamPort_e port)
+status_e OMXVisionCam::setWBalColorGains(void* param, uint32_t size __attribute__ ((unused)), VisionCamPort_e port)
 {
     status_e vcamError = STATUS_BASE;
     OMX_ERRORTYPE omxError = OMX_ErrorUndefined;
@@ -2642,7 +2645,7 @@ status_e OMXVisionCam::setWBalColorGains(void* param, uint32_t size, VisionCamPo
 #endif // EXPORTED_3A
 
 #ifndef EXPORTED_3A
-status_e OMXVisionCam::setGammaTableColorGains(void* param, uint32_t size, VisionCamPort_e port)
+status_e OMXVisionCam::setGammaTableColorGains(void* param, uint32_t size __attribute__ ((unused)), VisionCamPort_e port __attribute__ ((unused)))
 {
     OMX_ERRORTYPE omxError = OMX_ErrorUndefined;
 
@@ -2715,7 +2718,7 @@ status_e OMXVisionCam::setGammaTableColorGains(void* param, uint32_t size, Visio
 }
 #endif // EXPORTED_3A
 
-status_e OMXVisionCam::setFormatRotation(void* param, uint32_t size, VisionCamPort_e port)
+status_e OMXVisionCam::setFormatRotation(void* param, uint32_t size __attribute__ ((unused)), VisionCamPort_e port)
 {
     int32_t p;
     LOOP_PORTS( port , p )
@@ -2725,7 +2728,7 @@ status_e OMXVisionCam::setFormatRotation(void* param, uint32_t size, VisionCamPo
     return STATUS_SUCCESS;
 }
 
-status_e OMXVisionCam::setPreviewRotation(void* param, uint32_t size, VisionCamPort_e port)
+status_e OMXVisionCam::setPreviewRotation(void* param, uint32_t size __attribute__ ((unused)), VisionCamPort_e port)
 {
     OMX_ERRORTYPE omxError = OMX_ErrorUndefined;
     OMX_CONFIG_ROTATIONTYPE rotation;
@@ -2745,12 +2748,12 @@ status_e OMXVisionCam::setPreviewRotation(void* param, uint32_t size, VisionCamP
 }
 
 #if defined (EXPORTED_3A)
-status_e OMXVisionCam::startCollectingMaual3AParams(void* param, uint32_t size, VisionCamPort_e port)
+status_e OMXVisionCam::startCollectingMaual3AParams(void* param __attribute__ ((unused)), uint32_t size __attribute__ ((unused)), VisionCamPort_e port __attribute__ ((unused)))
 {
     return m3A_Export.hold_3A();
 }
 
-status_e OMXVisionCam::setManual3AParam(void* param, uint32_t size, VisionCamPort_e port)
+status_e OMXVisionCam::setManual3AParam(void* param, uint32_t size, VisionCamPort_e port __attribute__ ((unused)))
 {
     VisionCam_3Asettings_Base_t* p = (VisionCam_3Asettings_Base_t* )param;
     status_e vcamError = m3A_Export.set( p->eParamType, p->pData, size );
@@ -2762,7 +2765,7 @@ status_e OMXVisionCam::setManual3AParam(void* param, uint32_t size, VisionCamPor
     return vcamError;
 }
 
-status_e OMXVisionCam::applyCollectedManual3AParams(void* param, uint32_t size, VisionCamPort_e port)
+status_e OMXVisionCam::applyCollectedManual3AParams(void* param __attribute__ ((unused)), uint32_t size __attribute__ ((unused)), VisionCamPort_e port __attribute__ ((unused)))
 {
     status_e vcamError = STATUS_BASE;
     vcamError = m3A_Export.release_3A();
@@ -2774,7 +2777,7 @@ status_e OMXVisionCam::applyCollectedManual3AParams(void* param, uint32_t size, 
     return vcamError;
 }
 
-status_e OMXVisionCam::resetManual3AParams(void* param, uint32_t size, VisionCamPort_e port)
+status_e OMXVisionCam::resetManual3AParams(void* param __attribute__ ((unused)), uint32_t size __attribute__ ((unused)), VisionCamPort_e port __attribute__ ((unused)))
 {
     return m3A_Export.reset();
 }

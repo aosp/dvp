@@ -116,41 +116,59 @@ DVP_OptimizedKernels_t optkerns[] = {
 DVP_U32 numOptKerns = dimof(optkerns);
 #endif
 
+#if (defined(DVP_USE_IMGLIB) || defined(DVP_USE_VLIB))
 static dvp_image_shift_t cpu_shift3 = {
     -1, -1, 0, 2, 2, 0,
 };
+#endif
 
+#if (defined(DVP_USE_IMGLIB) || defined(DVP_USE_VLIB))
 static dvp_image_shift_t cpu_shift5 = {
     -2, -2, 0, 4, 4, 0,
 };
+#endif
 
+#if (defined(DVP_USE_IMGLIB) /*|| defined(DVP_USE_VLIB)*/)
 static dvp_image_shift_t cpu_shift7 = {
     -3, -3, 0, 6, 6, 0,
 };
+#endif
 
+#if (defined(DVP_USE_IMGLIB) /*|| defined(DVP_USE_VLIB)*/)
 static dvp_image_shift_t cpu_shift8 = {
     -4, -4, 0, 7, 7, 0,
 };
+#endif
 
+#if (defined(DVP_USE_IMGLIB) /*|| defined(DVP_USE_VLIB)*/)
 static dvp_image_shift_t cpu_shift11 = {
     -5, -5, 0, 10, 10, 0,
 };
+#endif
 
+#if (defined(DVP_USE_IMGLIB) /*|| defined(DVP_USE_VLIB)*/)
 static dvp_image_shift_t cpu_shift16 = {
     -8, -8, 0, 15, 15, 0,
 };
+#endif
 
+#if (defined(DVP_USE_VLIB) /*|| defined(DVP_USE_IMGLIB) */)
 static dvp_image_shift_t cpu_nonmax_shift3 = {
     -1, 1, 2, 2, 0, 0,
 };
+#endif
 
+#if (defined(DVP_USE_VLIB) /*|| defined(DVP_USE_IMGLIB) */)
 static dvp_image_shift_t cpu_nonmax_shift5 = {
     -2, 2, 4, 4, 0, 0,
 };
+#endif
 
+#if (defined(DVP_USE_VLIB) /*|| defined(DVP_USE_IMGLIB) */)
 static dvp_image_shift_t cpu_nonmax_shift7 = {
     -3, 3, 6, 6, 0, 0,
 };
+#endif
 
 #if defined(DVP_USE_VLIB)
 static void dvp_vlib_nms_mxn_shift(DVP_KernelNode_t *node, dvp_image_shift_t *shift)
@@ -3016,7 +3034,6 @@ static DVP_U32 DVP_KernelGraphManager_CPU(DVP_KernelNode_t *pSubNodes, DVP_U32 s
                     else
                     {
                         DVP_U08 *tmpBuf = (DVP_U08 *)malloc(pIO->input.width * (16 + (3 -1)));
-                        DVP_U08* in  = pIO->input.pData[0];
                         DVP_U08* out = pIO->output.pData[0];
                         DVP_U32 y;
                         DVP_U32  newheight = pIO->input.height -(3 -1);
@@ -3082,7 +3099,6 @@ static DVP_U32 DVP_KernelGraphManager_CPU(DVP_KernelNode_t *pSubNodes, DVP_U32 s
                     DVP_U32  newwidth =  pImg->input.width - (filterSize -1);
                     DVP_U08* in  = pImg->input.pData[0];
                     DVP_U08* out = pImg->output.pData[0];
-                    DVP_U32 y;
 
                     for(i=0; i<newheight; i++)
                     {

@@ -176,7 +176,7 @@ static inline DVP_U32 DVP_Image_WidthStep(DVP_Image_t *pImage, DVP_U32 plane)
     return step;
 }
 
-DVP_U32 inline DVP_Image_HeightDiv(DVP_Image_t *pImage, DVP_U32 plane)
+inline DVP_U32 DVP_Image_HeightDiv(DVP_Image_t *pImage, DVP_U32 plane)
 {
     DVP_U32 div = 1;
     if (pImage && plane < pImage->planes && plane > 0)
@@ -203,7 +203,7 @@ DVP_U32 inline DVP_Image_HeightDiv(DVP_Image_t *pImage, DVP_U32 plane)
     return div;
 }
 
-DVP_U32 inline DVP_Image_WidthDiv(DVP_Image_t *pImage, DVP_U32 plane)
+inline DVP_U32 DVP_Image_WidthDiv(DVP_Image_t *pImage, DVP_U32 plane)
 {
     DVP_U32 div = 1;
     if (pImage && plane < pImage->planes)

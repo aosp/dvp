@@ -258,7 +258,7 @@ static DVP_BOOL DVP_GetManagerKernelIndex(DVP_GraphManager_t *pManager, DVP_Kern
     for (i = 0; i < pManager->numSupportedKernels; i++)
     {
         //DVP_PRINT(DVP_ZONE_KGB, "Looking for kernel %u at %s[%u]=>%u (%s)\n", kernel, pManager->name, i, pManager->kernels[i].kernel, pManager->kernels[i].name);
-        if (pManager->kernels[i].kernel == kernel)
+        if ( kernel == (DVP_U32)(pManager->kernels[i].kernel) )
         {
             DVP_PRINT(DVP_ZONE_KGB, "Manager %s supports kernel %s at index %u\n", pManager->name, pManager->kernels[i].name, i);
             *pIndex = i;
@@ -863,7 +863,7 @@ DVP_BOOL DVP_QueryCoreForKernel(DVP_t *dvp, DVP_KernelNode_e kernel, DVP_Core_e 
             DVP_U32 k;
             for (k = 0; k < dvp->managers[m].numSupportedKernels; k++)
             {
-                if (kernel == dvp->managers[m].kernels[k].kernel)
+                if (kernel == (DVP_U32)(dvp->managers[m].kernels[k].kernel) )
                 {
                     return DVP_TRUE;
                 }

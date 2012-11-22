@@ -345,7 +345,7 @@ thread_ret_t FileVisionCam::RunThread()
         else // fill in the data
         {
             bytesRead = 0;
-            uint32_t j = 0, y = 0, p = 0; // don't use i
+            uint32_t y = 0, p = 0; // don't use i
 
             pImage = (DVP_Image_t *)m_buffers[i].data;
 

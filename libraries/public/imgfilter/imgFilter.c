@@ -407,6 +407,20 @@ int main(int argc, char *argv[])
             free(input);
             free(output);
         }
+        else
+        {
+            if( input )
+            {
+                free(input);
+                input = NULL;
+            }
+
+            if( output )
+            {
+                free(output);
+                output = NULL;
+            }
+        }
         return 0;
     }
     return -1;

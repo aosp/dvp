@@ -564,6 +564,8 @@ char **clLoadSources(char *filename, cl_uint *pNumLines)
                 }
             }
         }
+        fclose(fp);
+        fp = NULL;
     }
     return lines;
 }
@@ -607,6 +609,7 @@ int cl_precompiled_header(char *filename, cl_kernel_bin_t *bins)
         bw += fprintf(fo, "static cl_kernel_bin_t gKernelBins = { 0x%08x, "FMT_SIZE_T", "FMT_SIZE_T", "FMT_SIZE_T", (size_t *)&gKernelBinarySizes, (cl_byte **)&gKernelBinaries };\n", (uint32_t)bins->deviceTypes, bins->numDevices, bins->numBytesSizes, bins->numBytesData);
         bw += fprintf(fo, "#endif\n");
         bw += fclose(fo);
+        fo = NULL;
         printf("Wrote %zu bytes to precompiled header\n", bw);
         return 1;
     } else {

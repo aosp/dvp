@@ -208,8 +208,10 @@ int main(int argc, char *argv[])
     }
     event_deinit(&wait_for_frame);
     event_deinit(&timer);
-    if (useFile)
+    if (useFile) {
         fclose(f);
+        f = NULL;
+    }
     DVP_PRINT(DVP_ZONE_ALWAYS, "Number of errors = %u\n", err);
     return err;
 }

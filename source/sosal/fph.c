@@ -312,6 +312,18 @@ int main(int argc, char *argv[])
         free(linear);
         fph_deinit(fph);
     }
+    else
+    {
+        if( linear ) {
+            free(linear);
+            linear = NULL;
+        }
+
+        if( fph ) {
+            fph_deinit(fph);
+        }
+    }
+
     return 0;
 }
 #endif

@@ -1041,6 +1041,19 @@ status_e dvp_img_copy_test(void)
 
     if(!dvp || !srcImage || !dstImage)
     {
+        if( dvp ) {
+            DVP_KernelGraph_Deinit(dvp);
+            dvp = 0;
+        }
+        if( srcImage ) {
+            free(srcImage);
+            srcImage = NULL;
+        }
+        if( dstImage ) {
+            free(dstImage);
+            dstImage = NULL;
+        }
+
         return STATUS_NOT_ENOUGH_MEMORY;
     }
 
@@ -1128,14 +1141,20 @@ status_e dvp_img_copy_test(void)
     DVP_PRINT(DVP_ZONE_ALWAYS,  "DVP_Image_Print() has ended with average success of %d %% \n", avg);
 #endif // DVP_DEGBUG
 
-    if( dvp )
+    if( dvp ) {
         DVP_KernelGraph_Deinit(dvp);
+        dvp = 0;
+    }
 
-    if( srcImage )
+    if( srcImage ) {
         free(srcImage);
+        srcImage = NULL;
+    }
 
-    if( dstImage )
+    if( dstImage ) {
         free(dstImage);
+        dstImage = NULL;
+    }
 
     return status;
 }
@@ -1219,9 +1238,14 @@ status_e dvp_image_serialization(const char *testVariant)
             {
                 DVP_U32 len = alloc_size - offset;
                 DVP_U08 *mem = malloc(len);
-                memset(mem, CMP_VAL, len);
-                if ( memcmp(&buffer[offset], mem, len ) != 0)
-                     ret = STATUS_FAILURE;
+                if( mem )
+                {
+                    memset(mem, CMP_VAL, len);
+                    if ( memcmp(&buffer[offset], mem, len ) != 0)
+                         ret = STATUS_FAILURE;
+                    free(mem);
+                    mem = NULL;
+                }
             }
             else if ( !strcmp(testVariant, UNSERIALIZE) /*&& buffer*/ )
             {

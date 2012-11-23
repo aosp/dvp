@@ -43,7 +43,7 @@ DataBuffer_t::DataBuffer_t(size_t allocSize )
     if ( pData)
         nBuffSize = allocSize;
     bytesWritten = 0;
-#else // DVP_USE_ION
+#else // defined DVP_USE_ION...
 
     mutex_init(&mBuffLock);
 

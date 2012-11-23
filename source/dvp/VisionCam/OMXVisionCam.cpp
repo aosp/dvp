@@ -4801,6 +4801,7 @@ void OMXVisionCam::FrameReceivedFunc(void *data)
         DVP_PRINT(DVP_ZONE_ERROR, "ERROR: a frame buffer is received, but there is no matching buffer.\n" );
     }
 }
+
 #if GET_SENSOR_CAPS
 void OMXVisionCam::getSensorCaps(VCamSensorInfo& s )
 {
@@ -4809,19 +4810,25 @@ void OMXVisionCam::getSensorCaps(VCamSensorInfo& s )
     OMX_TI_CONFIG_SHAREDBUFFER sharedBuffer;
     DataBuffer_t *pBuffer = new DataBuffer_t(sizeof(OMX_TI_CAPTYPE));
 
-    OMX_STRUCT_INIT(sharedBuffer, OMX_TI_CONFIG_SHAREDBUFFER, mLocalVersion);
-    sharedBuffer.nPortIndex         = mCurGreContext.mPortsInUse[VCAM_PORT_ALL];
-    sharedBuffer.nSharedBuffSize    = pBuffer->getSize();
-    sharedBuffer.pSharedBuff        = (OMX_U8*)pBuffer->getData();
-
-    OMX_STRUCT_INIT_PTR(caps, OMX_TI_CAPTYPE, mLocalVersion);
-    caps = (OMX_TI_CAPTYPE*)pBuffer->getData();
-
-    // Get capabilities from OMX Camera
-    omxError =  OMX_GetConfig(mCurGreContext.mHandleComp, (OMX_INDEXTYPE) OMX_TI_IndexConfigCamCapabilities, &sharedBuffer);
-    if ( OMX_ErrorNone == omxError )
+    if( pBuffer )
     {
-//        s.supportedModesCnt = caps->
+        OMX_STRUCT_INIT(sharedBuffer, OMX_TI_CONFIG_SHAREDBUFFER, mLocalVersion);
+        sharedBuffer.nPortIndex         = mCurGreContext.mPortsInUse[VCAM_PORT_ALL];
+        sharedBuffer.nSharedBuffSize    = pBuffer->getSize();
+        sharedBuffer.pSharedBuff        = (OMX_U8*)pBuffer->getData();
+
+        caps = (OMX_TI_CAPTYPE*)pBuffer->getData();
+        OMX_STRUCT_INIT_PTR(caps, OMX_TI_CAPTYPE, mLocalVersion);
+
+        // Get capabilities from OMX Camera
+        omxError =  OMX_GetConfig(mCurGreContext.mHandleComp, (OMX_INDEXTYPE) OMX_TI_IndexConfigCamCapabilities, &sharedBuffer);
+        if ( OMX_ErrorNone == omxError )
+        {
+    //        s.supportedModesCnt = caps->
+        }
+
+        delete pBuffer;
+        pBuffer = NULL;
     }
 }
 #endif // GET_SENSOR_CAPS

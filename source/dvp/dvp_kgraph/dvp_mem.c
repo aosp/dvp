@@ -234,7 +234,6 @@ inline DVP_U32 DVP_Image_WidthDiv(DVP_Image_t *pImage, DVP_U32 plane)
     return div;
 }
 
-
 DVP_U32 DVP_Image_LineRange(DVP_Image_t *pImage, DVP_U32 plane)
 {
     DVP_U32 lineRange = 0;

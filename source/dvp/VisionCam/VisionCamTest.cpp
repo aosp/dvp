@@ -1437,6 +1437,8 @@ void sendBufferTo_V4L(VisionCamFrame *cameraFrame)
         fwrite( prvFrame->mExtraDataBuf , EXTRA_DATA_FILE_LENGHT , 1 , XtraDataFile );
 //         printf("\r gre_cam_fr_%05d.edt written", cur);
         cur++;
+        fclose(XtraDataFile);
+        XtraDataFile = NULL;
     }
 #endif
     fprintf(stdout, "\r total frames: video - %d, preview - %d, (diff: %d)",

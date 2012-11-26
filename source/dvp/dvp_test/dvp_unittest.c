@@ -1607,6 +1607,603 @@ status_e dvp_imageshift_test(void)
     return status;
 }
 
+
+inline void create_dvp_image(DVP_Handle *dvp, DVP_Image_t **pImage, DVP_U32 img_width, DVP_U32 img_height, fourcc_t fourcc)
+{
+    *dvp = DVP_KernelGraph_Init();
+    if( *dvp )
+    {
+        *pImage = malloc(sizeof(DVP_Image_t));
+        if( *pImage )
+        {
+            DVP_Image_Init(*pImage, img_width, img_height, fourcc);
+            if( DVP_FALSE == DVP_Image_Alloc( *dvp, *pImage, DVP_MTYPE_DEFAULT ) )
+            {
+                DVP_Image_Deinit(*pImage);
+                free(*pImage);
+                *pImage = NULL;
+
+                DVP_KernelGraph_Deinit(*dvp);
+                *dvp = 0;
+            }
+        }
+    }
+}
+
+inline void destroy_dvp_image(DVP_Handle *dvp, DVP_Image_t *pImage )
+{
+    if( *dvp )
+    {
+        if( pImage && DVP_TRUE == DVP_Image_Free( *dvp, pImage ) )
+        {
+            DVP_Image_Deinit(pImage);
+            free(pImage);
+            pImage = NULL;
+
+            DVP_KernelGraph_Deinit(*dvp);
+            *dvp = 0;
+        }
+    }
+}
+
+status_e dvp_image_width_div_test(void)
+{
+    status_e status = STATUS_FAILURE;
+    DVP_Image_t *pImage = NULL;
+    DVP_Handle dvp = 0;
+    DVP_U32 plane = -1;
+
+    create_dvp_image(&dvp, &pImage, width, height, FOURCC_NV12);
+    if( dvp && pImage )
+    {
+        DVP_U32 div = 1;
+        for ( plane = 0; plane < pImage->planes; plane++ )
+        {
+            switch (pImage->color)
+            {
+                case FOURCC_IYUV:
+                case FOURCC_YV12:
+                case FOURCC_NV12:
+                case FOURCC_NV21:
+                case FOURCC_YU16:
+                case FOURCC_YV16:
+                    div = 2;
+                    break;
+                case FOURCC_YUV9:
+                case FOURCC_YVU9:
+                    div = 4;
+                    break;
+                default:
+                    div = 1;
+                    break;
+            }
+            if( div == DVP_Image_WidthDiv(pImage, plane) ) {
+                status = STATUS_SUCCESS;
+            }
+            else {
+                status = STATUS_FAILURE;
+            }
+        }
+        destroy_dvp_image(&dvp, pImage);
+    }
+    return status;
+}
+
+status_e dvp_image_height_div_test(void)
+{
+    status_e status = STATUS_FAILURE;
+    DVP_Image_t *pImage = NULL;
+    DVP_Handle dvp = 0;
+    DVP_U32 plane = -1;
+
+    create_dvp_image(&dvp, &pImage, width, height, FOURCC_NV12);
+    if( dvp && pImage )
+    {
+        for ( plane = 0; plane < pImage->planes; plane++ )
+        {
+            DVP_U32 div = 1;
+            if (plane > 0)
+            {
+                switch (pImage->color)
+                {
+                    case FOURCC_IYUV:
+                    case FOURCC_YV12:
+                    case FOURCC_NV12:
+                    case FOURCC_NV21:
+                        div = 2;
+                        break;
+                    case FOURCC_YUV9:
+                    case FOURCC_YVU9:
+                        div = 4;
+                        break;
+                    case FOURCC_YU16:
+                    case FOURCC_YV16:
+                    default:
+                        div = 1;
+                        break;
+                }
+            }
+            else if (pImage->color == FOURCC_BIN1){
+                div = 8;
+            }
+
+            if( div == DVP_Image_HeightDiv(pImage, plane) ) {
+                status = STATUS_SUCCESS;
+            }
+            else {
+                status = STATUS_FAILURE;
+                break;
+            }
+        }
+        destroy_dvp_image(&dvp, pImage);
+    }
+    return status;
+}
+
+inline DVP_U32 dvp_test_image_width_step(DVP_Image_t *pImage, DVP_U32 plane)
+{
+    DVP_U32 step = 1;
+    if (pImage && plane < pImage->planes && plane > 0)
+    {
+        switch (pImage->color)
+        {
+            case FOURCC_NV12:
+            case FOURCC_NV21:
+                step = 2;
+                break;
+        }
+    }
+    return step;
+}
+
+status_e dvp_image_line_range_test(void)
+{
+    status_e status = STATUS_FAILURE;
+    DVP_Image_t *pImage = NULL;
+    DVP_Handle dvp = 0;
+    DVP_U32 plane = -1;
+
+    create_dvp_image(&dvp, &pImage, width, height, FOURCC_NV12);
+    if( dvp && pImage )
+    {
+        for ( plane = 0; plane < pImage->planes; plane++ )
+        {
+            DVP_U32 lineRange = abs(pImage->y_stride);
+            DVP_U32 priLineSize = 0, secLineSize = 0;
+            if (plane > 0)
+            {
+                DVP_U32 xdiv = DVP_Image_WidthDiv(pImage, plane);
+                DVP_U32 xstep = dvp_test_image_width_step(pImage, plane);
+
+                priLineSize = (pImage->x_stride * dvp_test_image_width_step(pImage, 0)) *
+                              (pImage->bufWidth / DVP_Image_WidthDiv(pImage, 0));
+                secLineSize = (pImage->x_stride * xstep) *
+                              (pImage->bufWidth / xdiv);
+                if (lineRange == priLineSize)
+                    lineRange = secLineSize;
+            }
+
+             if ( lineRange == DVP_Image_LineRange(pImage, plane) ) {
+                 status = STATUS_SUCCESS;
+             }
+             else {
+                 status = STATUS_FAILURE;
+                 break;
+             }
+        }
+
+        destroy_dvp_image(&dvp, pImage);
+    }
+
+    return status;
+}
+
+status_e dvp_image_plane_range_test(void)
+{
+    status_e status = STATUS_FAILURE;
+    DVP_Image_t *pImage = NULL;
+    DVP_Handle dvp = 0;
+    DVP_U32 plane = -1;
+
+    create_dvp_image(&dvp, &pImage, width, height, FOURCC_NV12);
+    if( dvp && pImage )
+    {
+        for ( plane = 0; plane < pImage->planes; plane++ )
+        {
+            DVP_U32 lineRange = 0;
+            DVP_U32 planeRange = 0;
+
+            if (pImage != NULL && plane < pImage->planes)
+            {
+                DVP_U32 ydiv = DVP_Image_HeightDiv(pImage, plane);
+                lineRange = DVP_Image_LineRange(pImage, plane);
+                planeRange = lineRange * pImage->bufHeight/ydiv;
+            }
+
+            if ( planeRange == DVP_Image_PlaneRange(pImage, plane ) ) {
+                status = STATUS_SUCCESS;
+            }
+            else {
+                status = STATUS_FAILURE;
+                break;
+            }
+        }
+
+        destroy_dvp_image(&dvp, pImage);
+    }
+    return status;
+}
+
+status_e dvp_image_range_test(void)
+{
+    status_e status = STATUS_FAILURE;
+    DVP_Image_t *pImage = NULL;
+    DVP_Handle dvp = 0;
+
+    create_dvp_image(&dvp, &pImage, width, height, FOURCC_NV12);
+    if( dvp && pImage )
+    {
+        DVP_U32 plane,expRange = 0;
+        for (plane = 0; plane < pImage->planes; plane++)
+            expRange += DVP_Image_PlaneSize(pImage, plane);
+
+        if ( expRange == DVP_Image_Range(pImage) ) {
+            status = STATUS_SUCCESS;
+        }
+        destroy_dvp_image(&dvp, pImage);
+    }
+
+    return status;
+}
+
+status_e dvp_image_addressing_test(void)
+{
+    status_e status = STATUS_FAILURE;
+    DVP_Image_t *pImage = NULL;
+    DVP_Handle dvp = 0;
+    DVP_U32 plane = -1;
+
+    create_dvp_image(&dvp, &pImage, width, height, FOURCC_NV12);
+    if( dvp && pImage )
+    {
+        for ( plane = 0; plane < pImage->planes; plane++ )
+        {
+            DVP_U08 *ptr = pImage->pBuffer[plane];
+            DVP_U32 i = DVP_Image_Offset(pImage, (width/4), (height/4), plane);
+
+            if ( &ptr[i] == DVP_Image_Addressing(pImage, (width/4), (height/4), plane) ) {
+                status = STATUS_SUCCESS;
+            }
+            else {
+                status = STATUS_FAILURE;
+                break;
+            }
+        }
+
+        destroy_dvp_image(&dvp, pImage);
+    }
+    return status;
+}
+
+status_e dvp_image_offset_test(void)
+{
+    status_e status = STATUS_FAILURE;
+    DVP_Image_t *pImage = NULL;
+    DVP_Handle dvp = 0;
+    DVP_U32 plane = -1;
+
+    create_dvp_image(&dvp, &pImage, width, height, FOURCC_NV12);
+    if( dvp && pImage )
+    {
+        for ( plane = 0; plane < pImage->planes; plane++ )
+        {
+            DVP_U32 expRes = 0, x, y;
+            x = width /2;
+            y = height / 2;
+            if ( x < pImage->bufWidth && y < pImage->bufHeight )
+            {
+                DVP_U32 xstep = dvp_test_image_width_step(pImage, plane);
+                DVP_U32 xdiv = DVP_Image_WidthDiv(pImage, plane);
+                DVP_U32 ydiv = DVP_Image_HeightDiv(pImage, plane);
+                DVP_U32 ystr = DVP_Image_LineRange(pImage, plane);
+
+                expRes = ((y/ydiv) * ystr) + ((x/xdiv) * (pImage->x_stride*xstep));
+            }
+
+            if ( expRes == DVP_Image_Offset(pImage, x, y, plane ) ) {
+                status = STATUS_SUCCESS;
+            }
+            else {
+                status = STATUS_FAILURE;
+                break;
+            }
+        }
+        destroy_dvp_image(&dvp, pImage);
+    }
+    return status;
+}
+
+status_e dvp_image_equal_test(void)
+{
+    status_e status = STATUS_FAILURE;
+    DVP_Image_t *pImage[2] = { NULL, NULL };
+    DVP_Handle dvp = 0;
+
+    create_dvp_image(&dvp, &pImage[0], width, height, FOURCC_NV12);
+
+    pImage[1] = malloc(sizeof(DVP_Image_t));
+    DVP_Image_Init(pImage[1], width, height, FOURCC_NV12);
+
+    if( dvp && pImage[0] && DVP_Image_Alloc(dvp, pImage[1], DVP_MTYPE_DEFAULT) )
+    {
+        DVP_U32 bfLen = (height * width * 3u) / 2u ;
+        DVP_S08 ptr[bfLen];
+        memset(ptr, 0x57, bfLen);
+
+        DVP_Image_Fill(pImage[0], ptr, bfLen );
+        DVP_Image_Fill(pImage[1], ptr, bfLen );
+
+        if ( DVP_Image_Equal(pImage[0], pImage[1]) ) {
+            status = STATUS_SUCCESS;
+        }
+
+        DVP_Image_Free( dvp, pImage[1] );
+        DVP_Image_Deinit(pImage[1]);
+        free(pImage[1]);
+        pImage[1] = NULL;
+
+        destroy_dvp_image(&dvp, pImage[0] );
+    }
+    return status;
+}
+
+status_e dvp_image_patch_line_size_test(void)
+{
+    status_e status = STATUS_FAILURE;
+    DVP_Image_t *pImage = NULL;
+    DVP_Handle dvp = 0;
+    DVP_U32 plane = -1;
+
+    create_dvp_image(&dvp, &pImage, width, height, FOURCC_NV12);
+    if( dvp && pImage )
+    {
+        DVP_Image_SetPatch(pImage, (width/4), (height/4), (width/2), (height/2) );
+
+        for ( plane = 0; plane < pImage->planes; plane++ )
+        {
+            DVP_U32 exp_lineSize = 0;
+            if (pImage != NULL && plane < pImage->planes)
+            {
+                DVP_U32 xstep = dvp_test_image_width_step(pImage, plane);
+                DVP_U32 xdiv = DVP_Image_WidthDiv(pImage, plane);
+
+                exp_lineSize = (pImage->x_stride * xstep) * (pImage->width / xdiv);
+            }
+
+            if ( exp_lineSize == DVP_Image_PatchLineSize(pImage, plane) ) {
+                status = STATUS_SUCCESS;
+            }
+            else {
+                status = STATUS_FAILURE;
+                break;
+            }
+        }
+
+        destroy_dvp_image(&dvp, pImage);
+    }
+    return status;
+}
+
+status_e dvp_image_patch_plane_size_test(void)
+{
+    status_e status = STATUS_FAILURE;
+    DVP_Image_t *pImage = NULL;
+    DVP_Handle dvp = 0;
+    DVP_U32 plane = -1;
+
+    create_dvp_image(&dvp, &pImage, width, height, FOURCC_NV12);
+    if( dvp && pImage )
+    {
+        DVP_Image_SetPatch(pImage, (width/4), (height/4), (width/2), (height/2) );
+
+        for ( plane = 0; plane < pImage->planes; plane++ )
+        {
+            DVP_U32 lineSize = 0;
+            DVP_U32 exp_planeSize = 0;
+
+            if (pImage != NULL && plane < pImage->planes)
+            {
+                DVP_U32 ydiv = DVP_Image_HeightDiv(pImage, plane);
+
+                lineSize = DVP_Image_PatchLineSize(pImage, plane);
+                exp_planeSize = lineSize * pImage->height/ydiv;
+            }
+
+            if( exp_planeSize == DVP_Image_PatchPlaneSize(pImage, plane) ) {
+                status = STATUS_SUCCESS;
+            }
+            else {
+                status = STATUS_FAILURE;
+                break;
+            }
+        }
+        destroy_dvp_image(&dvp, pImage);
+    }
+    return status;
+}
+
+status_e dvp_image_patch_size_test(void)
+{
+    status_e status = STATUS_FAILURE;
+    DVP_Image_t *pImage = NULL;
+    DVP_Handle dvp = 0;
+
+    create_dvp_image(&dvp, &pImage, width, height, FOURCC_NV12);
+    if( dvp && pImage )
+    {
+        DVP_Image_SetPatch(pImage, (width/4), (height/4), (width/2), (height/2) );
+
+        DVP_U32 p,size = 0;
+        if (pImage != NULL) {
+            for (p = 0; p < pImage->planes; p++) {
+                size += DVP_Image_PatchPlaneSize(pImage, p);
+            }
+        }
+
+        if( size == DVP_Image_PatchSize(pImage) ) {
+            status = STATUS_SUCCESS;
+        }
+        else {
+            status = STATUS_FAILURE;
+        }
+        destroy_dvp_image(&dvp, pImage);
+    }
+    return status;
+}
+
+status_e dvp_image_patch_addressing_test(void)
+{
+    status_e status = STATUS_FAILURE;
+    DVP_Image_t *pImage = NULL;
+    DVP_Handle dvp = 0;
+    DVP_U32 plane = -1;
+
+    create_dvp_image(&dvp, &pImage, width, height, FOURCC_NV12);
+    if( dvp && pImage )
+    {
+        DVP_U32 x_start , y_start;
+        x_start = width/4;
+        y_start = height/4;
+
+        DVP_Image_SetPatch(pImage, x_start, y_start, (width/2), (height/2) );
+
+        for ( plane = 0; plane < pImage->planes ; plane++ )
+        {
+            DVP_U08 *ptr = NULL;
+            DVP_U32 i = DVP_Image_PatchOffset(pImage, x_start, y_start, plane);
+            if (pImage != NULL && plane < pImage->planes) {
+                ptr = pImage->pData[plane];
+            }
+
+            if ( &ptr[i] == DVP_Image_PatchAddressing(pImage, x_start, y_start, plane) ) {
+                status = STATUS_SUCCESS;
+            }
+            else {
+                status = STATUS_FAILURE;
+                break;
+            }
+        }
+
+        destroy_dvp_image(&dvp, pImage);
+    }
+    return status;
+}
+
+status_e dvp_image_patch_offset_test(void)
+{
+    status_e status = STATUS_FAILURE;
+    DVP_Image_t *pImage = NULL;
+    DVP_Handle dvp = 0;
+    DVP_U32 plane = -1;
+
+    create_dvp_image(&dvp, &pImage, width, height, FOURCC_NV12);
+    if( dvp && pImage )
+    {
+        for ( plane = 0; plane < pImage->planes; plane++ )
+        {
+            DVP_U32 x_start , y_start;
+            x_start = width/4;
+            y_start = height/4;
+
+            DVP_Image_SetPatch(pImage, x_start, y_start, (width/2), (height/2) );
+            DVP_U32 expValue = 0u;
+            if (pImage != NULL && plane < pImage->planes && x_start < pImage->width && y_start < pImage->height )
+            {
+                DVP_U32 xstep = dvp_test_image_width_step(pImage, plane);
+                DVP_U32 xdiv = DVP_Image_WidthDiv(pImage, plane);
+                DVP_U32 ydiv = DVP_Image_HeightDiv(pImage, plane);
+                DVP_U32 ystr = DVP_Image_LineRange(pImage, plane);
+
+                expValue = ((y_start/ydiv) * ystr) + ((x_start/xdiv) * (pImage->x_stride*xstep));
+            }
+
+            if ( expValue == DVP_Image_PatchOffset(pImage, x_start, y_start, plane) ) {
+                status = STATUS_SUCCESS;
+            }
+            else {
+                status = STATUS_FAILURE;
+                break;
+            }
+        }
+        destroy_dvp_image(&dvp, pImage);
+    }
+    return status;
+}
+
+status_e dvp_image_set_patch_test(void)
+{
+    status_e status = STATUS_FAILURE;
+    DVP_Image_t *pImage = NULL;
+    DVP_Handle dvp = 0;
+
+    create_dvp_image(&dvp, &pImage, width, height, FOURCC_NV12);
+    if( dvp && pImage )
+    {
+        DVP_U32 x_start , y_start, patch_width, patch_height;
+        x_start = width/4;
+        y_start = height/4 ;
+        patch_width = width/2;
+        patch_height = height/2;
+
+        if( DVP_Image_SetPatch(pImage, x_start, y_start, patch_width, patch_height ) ) {
+            status = STATUS_SUCCESS;
+        }
+
+        destroy_dvp_image(&dvp, pImage );
+    }
+    return status;
+}
+
+status_e dvp_image_patch_equal_test(void)
+{
+    status_e status = STATUS_FAILURE;
+
+    DVP_Image_t *pImage[2] = { NULL, NULL };
+    DVP_Handle dvp = 0;
+
+    create_dvp_image(&dvp, &pImage[0], width, height, FOURCC_NV12);
+
+    pImage[1] = (DVP_Image_t*)malloc(sizeof(DVP_Image_t));
+    DVP_Image_Init(pImage[1], width, height, FOURCC_NV12);
+
+    if( dvp && pImage[0] && DVP_Image_Alloc(dvp, pImage[1], DVP_MTYPE_DEFAULT) )
+    {
+        DVP_U32 bfLen = (height * width * 3u) / 2u ;
+        DVP_S08 ptr[bfLen];
+        memset(ptr, 0x57, sizeof(ptr));
+
+        DVP_Image_Fill(pImage[0], ptr, sizeof(ptr) );
+        DVP_Image_Fill(pImage[1], ptr, sizeof(ptr) );
+
+        DVP_Image_SetPatch( pImage[0], (width/4), (height/4), (width/2), (height/2) );
+        DVP_Image_SetPatch( pImage[1], (width/4), (height/4), (width/2), (height/2) );
+
+        if ( DVP_Image_PatchEqual(pImage[0], pImage[1]) ) {
+            status = STATUS_SUCCESS;
+        }
+
+        DVP_Image_Free(dvp, pImage[1]);
+        DVP_Image_Deinit(pImage[1]);
+        free(pImage[1]);
+        pImage[1] = NULL;
+
+        destroy_dvp_image(&dvp, pImage[0] );
+    }
+
+    return status;
+}
+
+
 /*! \brief Local Unit Test Function Pointer */
 typedef status_e (*dvp_unittest_f)(void);
 
@@ -1649,6 +2246,21 @@ dvp_unittest_t unittests[] = {
     {STATUS_FAILURE, "Framework: Buffer Free Test", dvp_buffer_free_test},
     {STATUS_FAILURE, "Framework: Buffer Share Test", dvp_buffer_share_test},
     {STATUS_FAILURE, "Framework: Buffer Importer Test", dvp_buffer_import_test},
+    {STATUS_FAILURE, "Framework: Image Height Div Test", dvp_image_height_div_test},
+    {STATUS_FAILURE, "Framework: Image Width Div Test", dvp_image_width_div_test},
+    {STATUS_FAILURE, "Framework: Image Line Range Test", dvp_image_line_range_test},
+    {STATUS_FAILURE, "Framework: Image Plane Range Test", dvp_image_plane_range_test},
+    {STATUS_FAILURE, "Framework: Image Range Test", dvp_image_range_test},
+    {STATUS_FAILURE, "Framework: Image Addressing Test", dvp_image_addressing_test},
+    {STATUS_FAILURE, "Framework: Image Offset Test", dvp_image_offset_test},
+    {STATUS_FAILURE, "Framework: Image Equal Test", dvp_image_equal_test},
+    {STATUS_FAILURE, "Framework: Image Patch Line Size Test", dvp_image_patch_line_size_test},
+    {STATUS_FAILURE, "Framework: Image Patch Plane Size Test", dvp_image_patch_plane_size_test},
+    {STATUS_FAILURE, "Framework: Image Patch Size Test", dvp_image_patch_size_test},
+    {STATUS_FAILURE, "Framework: Image Patch Addressing Test", dvp_image_patch_addressing_test},
+    {STATUS_FAILURE, "Framework: Image Patch Offset Test", dvp_image_patch_offset_test},
+    {STATUS_FAILURE, "Framework: Image Set Patch Test", dvp_image_set_patch_test},
+    {STATUS_FAILURE, "Framework: Image Patch Equal Test", dvp_image_patch_equal_test},
 
 };
 

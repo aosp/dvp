@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (C) 2011 Texas Insruments, Inc.
+# Copyright (C) 2012 Texas Insruments, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -35,12 +35,15 @@ export DVP_ROOT=${MYDROID}/${TI_HW_ROOT}/dvp
 export HDR_FILE=${DVP_ROOT}/include/dvp/dvp_types.h
 export PUBLIC_LIB_HEADER_LIST=" ${DVP_ROOT}/libraries/public/yuv/include/yuv/dvp_kl_yuv.h
                                 ${DVP_ROOT}/libraries/public/imgfilter/include/imgfilter/dvp_kl_imgfilter.h
-                                ${DVP_ROOT}/libraries/public/ocl/include/ocl/dvp_kl_ocl.h"
+                                ${DVP_ROOT}/libraries/public/ocl/include/ocl/dvp_kl_ocl.h
+                                ${DVP_ROOT}/libraries/public/vrun/include/vrun/dvp_kl_vrun.h
+                                ${DVP_ROOT}/libraries/public/dsplib/include/dsplib/dvp_kl_dsplib.h
+                                ${DVP_ROOT}/libraries/public/dei/include/dei/dvp_kl_dei.h"
 export PRIVATE_LIB_HEADER_LIST="${MYDROID}/${VISION_ROOT}/libraries/protected/imglib/include/imglib/dvp_kl_imglib.h
                                 ${MYDROID}/${VISION_ROOT}/libraries/protected/vlib/include/vlib/dvp_kl_vlib.h
-                                ${MYDROID}/${VISION_ROOT}/libraries/protected/vrun/include/vrun/dvp_kl_vrun.h
                                 ${MYDROID}/${VISION_ROOT}/libraries/protected/rvm/include/rvm/dvp_kl_rvm.h
-                                ${MYDROID}/${VISION_ROOT}/libraries/protected/tismo/include/tismo/dvp_kl_tismo.h"
+                                ${MYDROID}/${VISION_ROOT}/libraries/protected/tismo/include/tismo/dvp_kl_tismo.h
+                                ${MYDROID}/${VISION_ROOT}/libraries/protected/tismov02/include/tismov02/dvp_kl_tismov02.h"
 export LIBHEADERS=
 
 export REPORT_DEBUG=    #set to something to debug the report generation without running the test
@@ -117,6 +120,12 @@ do
         adb push $DVP_ROOT/raw/input/handqvga_320x240_30Hz_UYVY.yuv /sdcard/raw/.
         adb push $DVP_ROOT/raw/input/handvga_640x480_30Hz_UYVY.yuv /sdcard/raw/.
         adb push $DVP_ROOT/raw/input/hand4Xvga_1280x960_30Hz_UYVY.yuv /sdcard/raw/.
+        adb push $DVP_ROOT/raw/input/handqqvga_160x360_30Hz_P400.bw /sdcard/raw/.
+        adb push $DVP_ROOT/raw/input/handqvga_320x720_30Hz_P400.bw /sdcard/raw/.
+        adb push $DVP_ROOT/raw/input/handvga_640x1440_30Hz_P400.bw /sdcard/raw/.
+        adb push $DVP_ROOT/raw/input/rvm_calib_160x120_to_160x120.txt /sdcard/raw/.
+        adb push $DVP_ROOT/raw/input/rvm_calib_320x240_to_320x240.txt /sdcard/raw/.
+        adb push $DVP_ROOT/raw/input/rvm_calib_640x480_to_640x480.txt /sdcard/raw/.
 
         adb shell "echo performance > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor"
         export A9FREQ=`adb shell "cat /sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_cur_freq"`
@@ -125,35 +134,35 @@ do
     if [ "${1}" == "simcop" ] || [ "${1}" == "all" ]; then
         export SIMCOP_FLAG=1
         echo Running SIMCOP QQVGA from ${QQVGA_FILE}
-        adb shell "cd /sdcard && dvp_test ${QQVGA_FILE} 160 120 30 UYVY ${FRAMES} 7" > ${DVP_BENCH_ROOT}/simcop/qqvga/log
+        adb shell "cd /sdcard && dvp_test ${QQVGA_FILE} 160 120 30 UYVY ${FRAMES} 7 simcop" > ${DVP_BENCH_ROOT}/simcop/qqvga/log
         echo Running SIMCOP QVGA from ${QVGA_FILE}
-        adb shell "cd /sdcard && dvp_test ${QVGA_FILE} 320 240 30 UYVY ${FRAMES} 7" > ${DVP_BENCH_ROOT}/simcop/qvga/log
+        adb shell "cd /sdcard && dvp_test ${QVGA_FILE} 320 240 30 UYVY ${FRAMES} 7 simcop" > ${DVP_BENCH_ROOT}/simcop/qvga/log
         echo Running SIMCOP VGA from ${VGA_FILE}
-        adb shell "cd /sdcard && dvp_test ${VGA_FILE} 640 480 30 UYVY ${FRAMES} 7" > ${DVP_BENCH_ROOT}/simcop/vga/log
+        adb shell "cd /sdcard && dvp_test ${VGA_FILE} 640 480 30 UYVY ${FRAMES} 7 simcop" > ${DVP_BENCH_ROOT}/simcop/vga/log
         #echo Running SIMCOP 4XVGA from ${x4VGA_FILE}
-        #adb shell "cd /sdcard && dvp_test ${x4VGA_FILE} 1280 960 30 UYVY ${FRAMES} 7" > ${DVP_BENCH_ROOT}/simcop/4xvga/log
+        #adb shell "cd /sdcard && dvp_test ${x4VGA_FILE} 1280 960 30 UYVY ${FRAMES} 7 simcop" > ${DVP_BENCH_ROOT}/simcop/4xvga/log
     fi
     if [ "${1}" == "dsp" ] || [ "${1}" == "all" ]; then
         export DSP_FLAG=1
         echo Running DSP QQVGA from ${QQVGA_FILE}
-        adb shell "cd /sdcard && dvp_test ${QQVGA_FILE} 160 120 30 UYVY ${FRAMES} 8" > ${DVP_BENCH_ROOT}/dsp/qqvga/log
+        adb shell "cd /sdcard && dvp_test ${QQVGA_FILE} 160 120 30 UYVY ${FRAMES} 7 dsp" > ${DVP_BENCH_ROOT}/dsp/qqvga/log
         echo Running DSP QVGA from ${QVGA_FILE}
-        adb shell "cd /sdcard && dvp_test ${QVGA_FILE} 320 240 30 UYVY ${FRAMES} 8" > ${DVP_BENCH_ROOT}/dsp/qvga/log
+        adb shell "cd /sdcard && dvp_test ${QVGA_FILE} 320 240 30 UYVY ${FRAMES} 7 dsp" > ${DVP_BENCH_ROOT}/dsp/qvga/log
         echo Running DSP VGA from ${VGA_FILE}
-        adb shell "cd /sdcard && dvp_test ${VGA_FILE} 640 480 30 UYVY ${FRAMES} 8" > ${DVP_BENCH_ROOT}/dsp/vga/log
+        adb shell "cd /sdcard && dvp_test ${VGA_FILE} 640 480 30 UYVY ${FRAMES} 7 dsp" > ${DVP_BENCH_ROOT}/dsp/vga/log
         #echo Running DSP 4XVGA from ${x4VGA_FILE}
-        #adb shell "cd /sdcard && dvp_test ${x4VGA_FILE} 1280 960 30 UYVY ${FRAMES} 8" > ${DVP_BENCH_ROOT}/dsp/4xvga/log
+        #adb shell "cd /sdcard && dvp_test ${x4VGA_FILE} 1280 960 30 UYVY ${FRAMES} 7 dsp" > ${DVP_BENCH_ROOT}/dsp/4xvga/log
     fi
     if [ "${1}" == "cpu" ] || [ "${1}" == "all" ]; then
         export CPU_FLAG=1
         echo Running CPU QQVGA from ${QQVGA_FILE}
-        adb shell "cd /sdcard && dvp_test ${QQVGA_FILE} 160 120 30 UYVY ${FRAMES} 9" > ${DVP_BENCH_ROOT}/cpu/qqvga/log
+        adb shell "cd /sdcard && dvp_test ${QQVGA_FILE} 160 120 30 UYVY ${FRAMES} 7 cpu" > ${DVP_BENCH_ROOT}/cpu/qqvga/log
         echo Running CPU QVGA from ${QVGA_FILE}
-        adb shell "cd /sdcard && dvp_test ${QVGA_FILE} 320 240 30 UYVY ${FRAMES} 9" > ${DVP_BENCH_ROOT}/cpu/qvga/log
+        adb shell "cd /sdcard && dvp_test ${QVGA_FILE} 320 240 30 UYVY ${FRAMES} 7 cpu" > ${DVP_BENCH_ROOT}/cpu/qvga/log
         echo Running CPU VGA from ${VGA_FILE}
-        adb shell "cd /sdcard && dvp_test ${VGA_FILE} 640 480 30 UYVY ${FRAMES} 9" > ${DVP_BENCH_ROOT}/cpu/vga/log
+        adb shell "cd /sdcard && dvp_test ${VGA_FILE} 640 480 30 UYVY ${FRAMES} 7 cpu" > ${DVP_BENCH_ROOT}/cpu/vga/log
         #echo Running CPU 4XVGA from ${x4VGA_FILE}
-        #adb shell "cd /sdcard && dvp_test ${x4VGA_FILE} 1280 960 30 UYVY ${FRAMES} 9" > ${DVP_BENCH_ROOT}/cpu/4xvga/log
+        #adb shell "cd /sdcard && dvp_test ${x4VGA_FILE} 1280 960 30 UYVY ${FRAMES} 7 cpu" > ${DVP_BENCH_ROOT}/cpu/4xvga/log
     fi
     if [ ${DVP_CUSTOM_DIR} ] && [ ${DVP_CUSTOM_FLAG} ]; then
         unset DVP_CUSTOM_FLAG

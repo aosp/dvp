@@ -24,13 +24,13 @@
 using namespace android;
 #endif
 
-struct Image {
+struct ImageShare_t {
     DVP_Image_t image;
     DVP_S32 fds[DVP_MAX_PLANES];
     DVP_VALUE hdls[DVP_MAX_PLANES];
 };
 
-struct Buffer {
+struct BufferShare_t {
     DVP_Buffer_t buf;
     DVP_S32 fd;
     DVP_VALUE handle;
@@ -68,8 +68,8 @@ public:
 
 private:
     DVP_Handle mDvp;
-    Vector<Image *> mImageList;
-    Vector<Buffer *> mBufferList;
+    Vector<ImageShare_t *> mImageList;
+    Vector<BufferShare_t *> mBufferList;
 };
 
 class BpDVPService : public BpInterface<IDVPService>
@@ -147,7 +147,7 @@ void DVPService::teardown()
     if (mDvp) {
 
         for (size_t i = 0; i < mImageList.size(); i++) {
-            Image *img = mImageList.itemAt(i);
+            ImageShare_t *img = mImageList.itemAt(i);
             for (DVP_U32 i = 0; i < img->image.planes; i++) {
                 close(img->fds[i]);
             }
@@ -155,7 +155,7 @@ void DVPService::teardown()
         }
 
         for (size_t i = 0; i < mBufferList.size(); i++) {
-            Buffer *buffer = mBufferList.itemAt(i);
+            BufferShare_t *buffer = mBufferList.itemAt(i);
             close(buffer->fd);
             DVP_Buffer_Free(mDvp, &buffer->buf);
         }
@@ -218,7 +218,7 @@ status_t DVPService::onTransact(uint32_t code, const Parcel &data, Parcel *reply
         case ALLOCATEIMG:
         {
             CHECK_INTERFACE(IDVPService, data, reply);
-            Image *img = (Image *)calloc(1, sizeof(Image));
+            ImageShare_t *img = (ImageShare_t *)calloc(1, sizeof(ImageShare_t));
 
             uint32_t w = data.readInt32();
             uint32_t h = data.readInt32();
@@ -249,7 +249,7 @@ status_t DVPService::onTransact(uint32_t code, const Parcel &data, Parcel *reply
         case ALLOCATEBUFFER:
         {
             CHECK_INTERFACE(IDVPService, data, reply);
-            Buffer *buffer = (Buffer *)calloc(1, sizeof(Buffer));
+            BufferShare_t *buffer = (BufferShare_t *)calloc(1, sizeof(BufferShare_t));
 
             uint32_t size = data.readInt32();
             uint32_t memType = data.readInt32();
@@ -298,7 +298,7 @@ static void test_image_import(const sp<IDVPService>& srv, DVP_Handle hDvp, fourc
 {
     num_tests++;
 
-    Image img;
+    ImageShare_t img;
     DVP_Image_Init(&img.image, 320, 240, fourcc);
     img.image.memType = type;
 
@@ -331,7 +331,7 @@ static void test_buffer_import(const sp<IDVPService>& srv, DVP_Handle hDvp, DVP_
 {
     num_tests++;
 
-    Buffer b;
+    BufferShare_t b;
     DVP_Buffer_Init(&b.buf, 1, 1024);
     b.buf.memType = type;
 

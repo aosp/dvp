@@ -1056,7 +1056,7 @@ DVP_U32 DVP_Image_Offset(DVP_Image_t *pImage, DVP_U32 x, DVP_U32 y, DVP_U32 p)
 
 DVP_U32 DVP_Image_PatchOffset(DVP_Image_t *pImage, DVP_U32 x, DVP_U32 y, DVP_U32 p)
 {
-    DVP_S32 i = 0;
+    DVP_U32 i = 0;
     if (pImage != NULL &&
         p < pImage->planes &&
         x < pImage->width &&

@@ -22,17 +22,19 @@
 #                       - Changing imx to simcop
 # v04   J.Villarreal    - Migrating to use new multiple header file configration
 #                         from FOSS refactoring.
+# v05   J.Villarreal    - Adding argument for log name
 
 $argc = @ARGV;
 if ($argc < 1) {
-  die "\nusage:   perl report.pl <dvp_types.h file> <top_directory_name> <0:debug/1:release> <num runs> <additional header files>\nversion: v04\n\n";
+  die "\nusage:   perl report.pl <log file name> <dvp_types.h file> <top_directory_name> <0:debug/1:release> <num runs> <additional header files>\nversion: v04\n\n";
 }
 
+my $log_name = shift;
 my $header = shift;
 my $top_dir = shift;
 my $release = shift;
 my $runs = shift;
-my $report  = "$top_dir/report.txt";
+my $report  = "$top_dir/report_$log_name.txt";
 my @stArray;
 my %stHash;
 my %libHash;
@@ -50,7 +52,7 @@ my $test_core;
 my @headers;
 
 # Parse all the library specific header files from command line
-for( $k=5; $k<=$argc; $k++ ) {
+for( $k=6; $k<=$argc; $k++ ) {
     push (@headers, shift);
 }
 
@@ -83,7 +85,7 @@ if($release) {
 
 # Parse library specific DVP header files
 foreach $k (@headers) {
-    %tmpHash = %{&parseHeader($k, "_KN_", "^enum {", "^};")};
+    %tmpHash = %{&parseHeader($k, "_KN_", "^enum ", "^};")};
     @stHash{ keys %tmpHash } = values %tmpHash;                 #concatenate hashes
 }
 
@@ -92,8 +94,8 @@ $dirCnt = 0;
 foreach $dir (@directories) {
     if(-d $dir) {
 
-        my $infile = "$dir/log";
-        my $out = "$dir/log.txt";
+        my $infile = "$dir/log_$log_name";
+        my $out = "$dir/log_$log_name.txt";
         my $newAvg;
         my $line;
         my @words;
@@ -191,7 +193,7 @@ sub parseHeader {
     my $DVP_KN_FEATURE_START = hex(0);
     my $DVP_KN_LIBRARY_START = hex(40000000);
 
-    open(HEAD, $header) || die("can't open file");
+    open(HEAD, $header) || die("can't open file: $header");
 
     $active = 0;
     $value = 0;

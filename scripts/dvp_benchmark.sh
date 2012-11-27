@@ -26,8 +26,10 @@ if [ -z "${VISION_ROOT}" ]; then
     echo "VISION_ROOT not defined, using $VISION_ROOT"
 fi
 if [ $# == 0 ]; then
-    echo "Usage: benchmark.sh [name <directory name> setup|simcop|dsp|cpu|all|custom <custom sub-directory> <graph number>|report]"
-    echo "Example: benchmark.sh name 120418_ICS setup all report "
+    echo "Usage: dvp_benchmark.sh [name <directory name> setup <graph_name> <core> report]"
+    echo "  graph_name: common|vrun|vrun2|ldc|imglib|vlib|rvm|tismo1|tismo2"
+    echo "  core      : simcop|dsp|cpu|all "
+    echo "Example: benchmark.sh name 120418_ICS setup common all report "
     exit
 fi
 
@@ -62,6 +64,43 @@ else
     export x4VGA_FILE=hand4Xvga
 fi
 
+if [[ "$@" =~ "common" ]]; then
+    export DVP_TEST_GRAPH_NUM=7
+    export DVP_TEST_GRAPH_STR="common"
+fi
+if [[ "$@" =~ "vrun" ]]; then
+    export DVP_TEST_GRAPH_NUM=8
+    export DVP_TEST_GRAPH_STR="vrun"
+fi
+if [[ "$@" =~ "vrun2" ]]; then
+    export DVP_TEST_GRAPH_NUM=9
+    export DVP_TEST_GRAPH_STR="vrun2"
+fi
+if [[ "$@" =~ "ldc" ]]; then
+    export DVP_TEST_GRAPH_NUM=17
+    export DVP_TEST_GRAPH_STR="ldc"
+fi
+if [[ "$@" =~ "imglib" ]]; then
+    export DVP_TEST_GRAPH_NUM=16
+    export DVP_TEST_GRAPH_STR="imglib"
+fi
+if [[ "$@" =~ "vlib" ]]; then
+    export DVP_TEST_GRAPH_NUM=22
+    export DVP_TEST_GRAPH_STR="vlib"
+fi
+if [[ "$@" =~ "rvm" ]]; then
+    export DVP_TEST_GRAPH_NUM=1
+    export DVP_TEST_GRAPH_STR="rvm"
+fi
+if [[ "$@" =~ "tismo1" ]]; then
+    export DVP_TEST_GRAPH_NUM=15
+    export DVP_TEST_GRAPH_STR="tismo1"
+fi
+if [[ "$@" =~ "tismo2" ]]; then
+    export DVP_TEST_GRAPH_NUM=27
+    export DVP_TEST_GRAPH_STR="tismo2"
+fi
+
 while [ $# -gt 0 ];
 do
     if [ "${1}" == "name" ]; then
@@ -92,25 +131,6 @@ do
             echo "Directory /dvp/benchmarking exists, will overwrite previous data"
         fi
     fi
-    if [ "${1}" == "custom" ]; then
-        shift
-        export DVP_CUSTOM_DIR=$1
-        shift
-        export DVP_CUSTOM_GRAPH=$1
-        if [ "${DVP_CUSTOM_GRAPH}" != "x" ]; then
-            export DVP_CUSTOM_FLAG=1
-        fi
-        if [ ! -d "${DVP_BENCH_ROOT}/${DVP_CUSTOM_DIR}" ]; then
-            echo "Creating directory for /dvp/benchmarking/${DVP_CUSTOM_DIR}"
-            mkdir ${DVP_BENCH_ROOT}/${DVP_CUSTOM_DIR}
-            mkdir ${DVP_BENCH_ROOT}/${DVP_CUSTOM_DIR}/qqvga
-            mkdir ${DVP_BENCH_ROOT}/${DVP_CUSTOM_DIR}/qvga
-            mkdir ${DVP_BENCH_ROOT}/${DVP_CUSTOM_DIR}/vga
-            #mkdir ${DVP_BENCH_ROOT}/${DVP_CUSTOM_DIR}/4xvga
-        else
-            echo "Directory /dvp/benchmarking/${DVP_CUSTOM_DIR} exists, will overwrite previous data"
-        fi
-    fi
     if [ "${1}" == "setup" ]; then
         # Connect ADB, Compile, install
         $DVP_ROOT/scripts/dvp.sh setup zone dvpbenchmark clean mm install test
@@ -134,46 +154,35 @@ do
     if [ "${1}" == "simcop" ] || [ "${1}" == "all" ]; then
         export SIMCOP_FLAG=1
         echo Running SIMCOP QQVGA from ${QQVGA_FILE}
-        adb shell "cd /sdcard && dvp_test ${QQVGA_FILE} 160 120 30 UYVY ${FRAMES} 7 simcop" > ${DVP_BENCH_ROOT}/simcop/qqvga/log
+        adb shell "cd /sdcard && dvp_test ${QQVGA_FILE} 160 120 30 UYVY ${FRAMES} ${DVP_TEST_GRAPH_NUM} simcop" > ${DVP_BENCH_ROOT}/simcop/qqvga/log_${DVP_TEST_GRAPH_STR}
         echo Running SIMCOP QVGA from ${QVGA_FILE}
-        adb shell "cd /sdcard && dvp_test ${QVGA_FILE} 320 240 30 UYVY ${FRAMES} 7 simcop" > ${DVP_BENCH_ROOT}/simcop/qvga/log
+        adb shell "cd /sdcard && dvp_test ${QVGA_FILE} 320 240 30 UYVY ${FRAMES} ${DVP_TEST_GRAPH_NUM} simcop" > ${DVP_BENCH_ROOT}/simcop/qvga/log_${DVP_TEST_GRAPH_STR}
         echo Running SIMCOP VGA from ${VGA_FILE}
-        adb shell "cd /sdcard && dvp_test ${VGA_FILE} 640 480 30 UYVY ${FRAMES} 7 simcop" > ${DVP_BENCH_ROOT}/simcop/vga/log
+        adb shell "cd /sdcard && dvp_test ${VGA_FILE} 640 480 30 UYVY ${FRAMES} ${DVP_TEST_GRAPH_NUM} simcop" > ${DVP_BENCH_ROOT}/simcop/vga/log_${DVP_TEST_GRAPH_STR}
         #echo Running SIMCOP 4XVGA from ${x4VGA_FILE}
-        #adb shell "cd /sdcard && dvp_test ${x4VGA_FILE} 1280 960 30 UYVY ${FRAMES} 7 simcop" > ${DVP_BENCH_ROOT}/simcop/4xvga/log
+        #adb shell "cd /sdcard && dvp_test ${x4VGA_FILE} 1280 960 30 UYVY ${FRAMES} 7 simcop" > ${DVP_BENCH_ROOT}/simcop/4xvga/log_${DVP_TEST_GRAPH_STR}
     fi
     if [ "${1}" == "dsp" ] || [ "${1}" == "all" ]; then
         export DSP_FLAG=1
         echo Running DSP QQVGA from ${QQVGA_FILE}
-        adb shell "cd /sdcard && dvp_test ${QQVGA_FILE} 160 120 30 UYVY ${FRAMES} 7 dsp" > ${DVP_BENCH_ROOT}/dsp/qqvga/log
+        adb shell "cd /sdcard && dvp_test ${QQVGA_FILE} 160 120 30 UYVY ${FRAMES} ${DVP_TEST_GRAPH_NUM} dsp" > ${DVP_BENCH_ROOT}/dsp/qqvga/log_${DVP_TEST_GRAPH_STR}
         echo Running DSP QVGA from ${QVGA_FILE}
-        adb shell "cd /sdcard && dvp_test ${QVGA_FILE} 320 240 30 UYVY ${FRAMES} 7 dsp" > ${DVP_BENCH_ROOT}/dsp/qvga/log
+        adb shell "cd /sdcard && dvp_test ${QVGA_FILE} 320 240 30 UYVY ${FRAMES} ${DVP_TEST_GRAPH_NUM} dsp" > ${DVP_BENCH_ROOT}/dsp/qvga/log_${DVP_TEST_GRAPH_STR}
         echo Running DSP VGA from ${VGA_FILE}
-        adb shell "cd /sdcard && dvp_test ${VGA_FILE} 640 480 30 UYVY ${FRAMES} 7 dsp" > ${DVP_BENCH_ROOT}/dsp/vga/log
+        adb shell "cd /sdcard && dvp_test ${VGA_FILE} 640 480 30 UYVY ${FRAMES} ${DVP_TEST_GRAPH_NUM} dsp" > ${DVP_BENCH_ROOT}/dsp/vga/log_${DVP_TEST_GRAPH_STR}
         #echo Running DSP 4XVGA from ${x4VGA_FILE}
-        #adb shell "cd /sdcard && dvp_test ${x4VGA_FILE} 1280 960 30 UYVY ${FRAMES} 7 dsp" > ${DVP_BENCH_ROOT}/dsp/4xvga/log
+        #adb shell "cd /sdcard && dvp_test ${x4VGA_FILE} 1280 960 30 UYVY ${FRAMES} ${DVP_TEST_GRAPH_NUM} dsp" > ${DVP_BENCH_ROOT}/dsp/4xvga/log_${DVP_TEST_GRAPH_STR}
     fi
     if [ "${1}" == "cpu" ] || [ "${1}" == "all" ]; then
         export CPU_FLAG=1
         echo Running CPU QQVGA from ${QQVGA_FILE}
-        adb shell "cd /sdcard && dvp_test ${QQVGA_FILE} 160 120 30 UYVY ${FRAMES} 7 cpu" > ${DVP_BENCH_ROOT}/cpu/qqvga/log
+        adb shell "cd /sdcard && dvp_test ${QQVGA_FILE} 160 120 30 UYVY ${FRAMES} ${DVP_TEST_GRAPH_NUM} cpu" > ${DVP_BENCH_ROOT}/cpu/qqvga/log_${DVP_TEST_GRAPH_STR}
         echo Running CPU QVGA from ${QVGA_FILE}
-        adb shell "cd /sdcard && dvp_test ${QVGA_FILE} 320 240 30 UYVY ${FRAMES} 7 cpu" > ${DVP_BENCH_ROOT}/cpu/qvga/log
+        adb shell "cd /sdcard && dvp_test ${QVGA_FILE} 320 240 30 UYVY ${FRAMES} ${DVP_TEST_GRAPH_NUM} cpu" > ${DVP_BENCH_ROOT}/cpu/qvga/log_${DVP_TEST_GRAPH_STR}
         echo Running CPU VGA from ${VGA_FILE}
-        adb shell "cd /sdcard && dvp_test ${VGA_FILE} 640 480 30 UYVY ${FRAMES} 7 cpu" > ${DVP_BENCH_ROOT}/cpu/vga/log
+        adb shell "cd /sdcard && dvp_test ${VGA_FILE} 640 480 30 UYVY ${FRAMES} ${DVP_TEST_GRAPH_NUM} cpu" > ${DVP_BENCH_ROOT}/cpu/vga/log_${DVP_TEST_GRAPH_STR}
         #echo Running CPU 4XVGA from ${x4VGA_FILE}
-        #adb shell "cd /sdcard && dvp_test ${x4VGA_FILE} 1280 960 30 UYVY ${FRAMES} 7 cpu" > ${DVP_BENCH_ROOT}/cpu/4xvga/log
-    fi
-    if [ ${DVP_CUSTOM_DIR} ] && [ ${DVP_CUSTOM_FLAG} ]; then
-        unset DVP_CUSTOM_FLAG
-        echo Running ${DVP_CUSTOM_DIR} QQVGA from ${QQVGA_FILE}
-        adb shell "cd /sdcard && dvp_test ${QQVGA_FILE} 160 120 30 UYVY ${FRAMES} ${DVP_CUSTOM_GRAPH}" > ${DVP_BENCH_ROOT}/${DVP_CUSTOM_DIR}/qqvga/log
-        echo Running ${DVP_CUSTOM_DIR} QVGA from ${QVGA_FILE}
-        adb shell "cd /sdcard && dvp_test ${QVGA_FILE} 320 240 30 UYVY ${FRAMES} ${DVP_CUSTOM_GRAPH}" > ${DVP_BENCH_ROOT}/${DVP_CUSTOM_DIR}/qvga/log
-        echo Running ${DVP_CUSTOM_DIR} VGA from ${VGA_FILE}
-        adb shell "cd /sdcard && dvp_test ${VGA_FILE} 640 480 30 UYVY ${FRAMES} ${DVP_CUSTOM_GRAPH}" > ${DVP_BENCH_ROOT}/${DVP_CUSTOM_DIR}/vga/log
-        #echo Running ${DVP_CUSTOM_DIR} 4XVGA from ${x4VGA_FILE}
-        #adb shell "cd /sdcard && dvp_test ${x4VGA_FILE} 1280 960 30 UYVY ${FRAMES} ${DVP_CUSTOM_GRAPH}" > ${DVP_BENCH_ROOT}/${DVP_CUSTOM_DIR}/4xvga/log
+        #adb shell "cd /sdcard && dvp_test ${x4VGA_FILE} 1280 960 30 UYVY ${FRAMES} ${DVP_TEST_GRAPH_NUM} cpu" > ${DVP_BENCH_ROOT}/cpu/4xvga/log_${DVP_TEST_GRAPH_STR}
     fi
     if [ "${1}" == "report" ]; then
         # Only include the headers that exist from vision_prebuilt
@@ -188,24 +197,20 @@ do
             export DSP_FLAG=1
             export CPU_FLAG=1
         fi
-        if [ -f "${DVP_BENCH_ROOT}/simcop/qqvga/log" ] && [ ${SIMCOP_FLAG} ]; then
+        if [ -f "${DVP_BENCH_ROOT}/simcop/qqvga/log_${DVP_TEST_GRAPH_STR}" ] && [ ${SIMCOP_FLAG} == 1 ]; then
             unset SIMCOP_FLAG
             echo "Generating SIMCOP report"
-            report.pl ${HDR_FILE} ${DVP_BENCH_ROOT}/simcop 1 ${FRAMES} ${LIBHEADERS} ${PUBLIC_LIB_HEADER_LIST}
+            report.pl ${DVP_TEST_GRAPH_STR} ${HDR_FILE} ${DVP_BENCH_ROOT}/simcop 1 ${FRAMES} ${LIBHEADERS} ${PUBLIC_LIB_HEADER_LIST}
         fi
-        if [ -f "${DVP_BENCH_ROOT}/dsp/qqvga/log" ] && [ ${DSP_FLAG} ]; then
+        if [ -f "${DVP_BENCH_ROOT}/dsp/qqvga/log_${DVP_TEST_GRAPH_STR}" ] && [ ${DSP_FLAG} == 1 ]; then
             unset DSP_FLAG
             echo "Generating DSP report"
-            report.pl ${HDR_FILE} ${DVP_BENCH_ROOT}/dsp 1 ${FRAMES} ${LIBHEADERS} ${PUBLIC_LIB_HEADER_LIST}
+            report.pl ${DVP_TEST_GRAPH_STR} ${HDR_FILE} ${DVP_BENCH_ROOT}/dsp 1 ${FRAMES} ${LIBHEADERS} ${PUBLIC_LIB_HEADER_LIST}
         fi
-        if [ -f "${DVP_BENCH_ROOT}/cpu/qqvga/log" ] && [ ${CPU_FLAG} ]; then
+        if [ -f "${DVP_BENCH_ROOT}/cpu/qqvga/log_${DVP_TEST_GRAPH_STR}" ] && [ ${CPU_FLAG} == 1 ]; then
             unset CPU_FLAG
             echo "Generating CPU report"
-            report.pl ${HDR_FILE} ${DVP_BENCH_ROOT}/cpu 1 ${FRAMES} ${LIBHEADERS} ${PUBLIC_LIB_HEADER_LIST}
-        fi
-        if [ -f "${DVP_BENCH_ROOT}/${DVP_CUSTOM_DIR}/qqvga/log" ]; then
-            echo "Generating ${DVP_CUSTOM_DIR} report"
-            report.pl ${HDR_FILE} ${DVP_BENCH_ROOT}/${DVP_CUSTOM_DIR} 0 ${FRAMES} ${LIBHEADERS} ${PUBLIC_LIB_HEADER_LIST}
+            report.pl ${DVP_TEST_GRAPH_STR} ${HDR_FILE} ${DVP_BENCH_ROOT}/cpu 1 ${FRAMES} ${LIBHEADERS} ${PUBLIC_LIB_HEADER_LIST}
         fi
     fi
     shift

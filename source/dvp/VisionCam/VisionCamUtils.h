@@ -38,7 +38,6 @@
 /** @fn void flushList(list_t *list)
    * Flushes a list data.
 */
-void flushList(list_t *list);
 
 class DataBuffer_t
 {
@@ -100,21 +99,19 @@ private: /// Private Methods
 template <class CookieType, typename funcPtrType>
 class VisionCamExecutionService {
 public:
-
     /** @typedef execFuncPrt_t
       * defines a type pointer to a 'Set_3A_*' member to function of 'CookieType' class.
     */
-//    typedef status_e (CookieType::*execFuncPrt_t)(void*);
     typedef funcPtrType execFuncPrt_t;
 
     /** @struct execListNode_t
       * Defines a structure that holds an ID against each Set_3A_* method in this class.
     */
     typedef struct _exec_list_node_t_ {
-        int32_t         optIndex;
-        execFuncPrt_t   exec;
-        size_t          dataSize;
-        void            *data;
+        int32_t         exec_index;
+        execFuncPrt_t   exec_func;
+        size_t          exec_data_size;
+        void            *exec_data;
     }execListNode_t;
 
     /** @fn VisionCamExecutionService(void *cook)
@@ -132,19 +129,10 @@ public:
     */
     ~VisionCamExecutionService() {
 
-        node_t *node = mExecutionDataList->head;
-        while( node )
-        {
-            if( ((execListNode_t*)(node->data))->data )
-            {
-                free( ((execListNode_t*)(node->data))->data );
-                ((execListNode_t*)(node->data))->data = NULL;
-            }
-            node = node->next;
-        }
-
         flushList( mExecutionDataList );
+
         list_destroy(mExecutionDataList);
+
         mExecutionDataList = NULL;
     }
 
@@ -156,26 +144,32 @@ public:
       * @param dataSize - size of the parameter that this function (pointed by execFunc) accepts.
       * @return true_e on success and false_e on failure.
     */
-    bool_e Register(int32_t index, execFuncPrt_t execFunc, size_t dataSize, void *data =  NULL )
+    bool_e Register(int32_t index, execFuncPrt_t exec_func, size_t data_size, void *data_in =  NULL )
     {
         bool_e ret = false_e;
         node_t *node = (node_t*)calloc(1, sizeof(node_t));
+
         if( node )
         {
             node->data = (value_t)calloc(1, sizeof(execListNode_t));
             if( node->data )
             {
-                ((execListNode_t*)(node->data))->optIndex  = index;
-                ((execListNode_t*)(node->data))->exec      = execFunc;
-                ((execListNode_t*)(node->data))->dataSize  = dataSize;
+                execListNode_t* ex_node = (execListNode_t*)(node->data);
+                ex_node->exec_index   = index;
+                ex_node->exec_func       = exec_func;
+                ex_node->exec_data_size   = data_size;
+                ex_node->exec_data       = NULL;
 
-                if( data && dataSize)
+                if( data_in && data_size )
                 {
-                    ((execListNode_t*)(node->data))->data = calloc(1, dataSize);
-                    memcpy( ((execListNode_t*)(node->data))->data, data, dataSize);
+                    ex_node->exec_data = calloc(1, data_size );
+
+                    if( ex_node->exec_data )
+                        memcpy( ex_node->exec_data, data_in, data_size );
                 }
 
                 list_push(mExecutionDataList, node);
+
                 ret = true_e;
             }
         }
@@ -192,7 +186,7 @@ public:
     execFuncPrt_t getFunc( int32_t index )
     {
         execListNode_t *n = getExecNode(index);
-        if ( n ) return n->exec;
+        if ( n ) return n->exec_func;
         return NULL;
     }
 
@@ -205,7 +199,7 @@ public:
     void *getData( int32_t index )
     {
         execListNode_t *n = getExecNode(index);
-        if( n ) return n->data;
+        if( n ) return n->exec_data;
         return NULL;
     }
 
@@ -220,7 +214,11 @@ public:
         execListNode_t *n = getExecNode(index);
         if( n )
         {
-            n->data = data;
+            if( NULL == n->exec_data )
+                n->exec_data = calloc(1, n->exec_data_size);
+
+            memcpy(n->exec_data, data, n->exec_data_size );
+
             return true_e;
         }
         else
@@ -237,7 +235,7 @@ public:
     size_t getDataSize( int32_t index )
     {
         execListNode_t *n = getExecNode(index);
-        if( n ) return n->dataSize;
+        if( n ) return n->exec_data_size;
         return 0;
     }
 
@@ -260,8 +258,8 @@ private:
 
             if( aa && bb )
             {
-                if( aa->optIndex == bb->optIndex ) ret = 0;
-                else if( aa->optIndex < bb->optIndex ) ret = -1;
+                if( aa->exec_index == bb->exec_index ) ret = 0;
+                else if( aa->exec_index < bb->exec_index ) ret = -1;
                 else ret = 1;
             }
         }
@@ -273,11 +271,51 @@ private:
     */
     execListNode_t *getExecNode(int32_t index)
     {
-        execListNode_t execNode = { index, NULL, 0, NULL };
+        execListNode_t execNode;
+        execNode.exec_index     = index;
+        execNode.exec_func      = NULL;
+        execNode.exec_data      = NULL;
+        execNode.exec_data_size = 0;
+
         node_t node = { NULL, NULL, (value_t)&execNode };
         node_t *found = list_search( mExecutionDataList, &node, reinterpret_cast<node_compare_f>(nodeCompare));
 
         return ( found ? (execListNode_t*)(found->data) : NULL);
+    }
+
+
+    void flushList(list_t *list )
+    {
+        node_t *node = list_pop( list );
+
+        while( node )
+        {
+            flush_node( node );
+            node = list_pop( list );
+        }
+    }
+
+    void flush_node(node_t *node)
+    {
+        if( node != NULL )
+        {
+            execListNode_t *ex_node = (execListNode_t*)(node->data);
+
+            if( ex_node && ex_node->exec_data )
+            {
+                free( ex_node->exec_data );
+                ex_node->exec_data = NULL;
+            }
+
+            if (ex_node)
+            {
+                free(ex_node);
+                ex_node = NULL;
+            }
+
+            free(node);
+            node = NULL;
+        }
     }
 };
 

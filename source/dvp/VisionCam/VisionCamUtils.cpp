@@ -16,20 +16,6 @@
 
 #include <VisionCamUtils.h>
 
-void flushList(list_t *list )
-{
-    node_t *node = list_pop( list );
-
-    while( node )
-    {
-        free( (void*)(node->data) );
-        free(node);
-
-        node = NULL;
-        node = list_pop( list );
-    }
-}
-
 /** @fn DataBuffer_t::DataBuffer_t(size_t allocSize )
   * Constructor.
   * Allocate ION (other allocator) mapped memory.

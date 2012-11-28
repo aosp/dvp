@@ -331,6 +331,12 @@ status_e OMXVisionCam::deinit()
     semaphore_delete(&mGreLocalSem);
     semaphore_delete(&mGreFocusSem);
 
+    if( mSetParameterExecutor )
+    {
+        delete mSetParameterExecutor;
+        mSetParameterExecutor = NULL;
+    }
+
     if( mPendingConfigs )
     {
         delete mPendingConfigs;
@@ -1119,7 +1125,7 @@ status_e OMXVisionCam::useBuffers( DVP_Image_t *pImages, uint32_t numImages, Vis
     // alloc the array for frame descriptors
     if( !mFrameDescriptors[port] )
     {
-        mFrameDescriptors[port] = new VisionCamFrame* [numImages];
+        mFrameDescriptors[port] = new VisionCamFrame*[numImages];
         if( NULL == mFrameDescriptors[port] )
         {
             greError = STATUS_NOT_ENOUGH_MEMORY;
@@ -1135,13 +1141,16 @@ status_e OMXVisionCam::useBuffers( DVP_Image_t *pImages, uint32_t numImages, Vis
             }
             else
             {
-                while( i )
-                    delete mFrameDescriptors[port][--i];
+                while( i ) {
+                    --i; // delete 0
+                    delete mFrameDescriptors[port][i];
+                }
 
                 delete [] mFrameDescriptors[port];
                 mFrameDescriptors[port] = NULL;
 
                 greError = STATUS_NOT_ENOUGH_MEMORY;
+                break;
             }
         }
     }
@@ -3790,28 +3799,22 @@ status_e OMXVisionCam::releaseBuffers( VisionCamPort_e port)
 {
     status_e greError = STATUS_SUCCESS;
 
-    OMX_PARAM_PORTDEFINITIONTYPE portCheck[ VCAM_PORT_MAX ];
-
     int32_t p;
-    LOOP_PORTS( port , p )
-    {
-        initPortCheck(&portCheck[p], p);
+    LOOP_PORTS( port , p ) {
+        if( mFrameDescriptors && mFrameDescriptors[p] ) {
 
-        for( uint32_t indBuff = 0; indBuff < portCheck[p].nBufferCountActual; indBuff++ )
-        {
-            if( mFrameDescriptors && mFrameDescriptors[p] && mFrameDescriptors[p][indBuff] )
-                delete mFrameDescriptors[p][indBuff];
-        }
+            for( int32_t i = 0; i < mCurGreContext.mCameraPortParams[p].mNumBufs; i++ )
+                delete mFrameDescriptors[p][i];
 
-        if( mFrameDescriptors && mFrameDescriptors[p] )
-        {
-            delete mFrameDescriptors[p];
+            delete []mFrameDescriptors[p];
+
             mFrameDescriptors[p] = NULL;
         }
     }
 
-    if (OMX_StateIdle == getComponentState())
+    if (OMX_StateIdle == getComponentState()) {
         greError = transitToState( OMX_StateLoaded, NULL, NULL );
+    }
 
     return greError;
 }

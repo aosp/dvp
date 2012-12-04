@@ -277,10 +277,11 @@ void DVP_KernelGraphBossDeinit(DVP_t *dvp)
 
         for (i = 0; i < dvp->numMgrs; i++)
         {
-            if (dvp->managers[i].enabled == true_e)
+            if (dvp->managers[i].enabled == true_e || dvp->managers[i].rpcc )
             {
                 DVP_PRINT(DVP_ZONE_KGB, "Shutting down %s Manager.\n",dvp->managers[i].name);
                 // deinitialize the proxy manager
+
                 dvp->managers[i].calls.deinit();
 
                 // disconnect the RPC mechanism

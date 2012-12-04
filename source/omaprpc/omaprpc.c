@@ -193,7 +193,7 @@ void omaprpc_close(omaprpc_t **prpc)
     if (prpc)
     {
         omaprpc_t *rpc = *prpc;
-        if (rpc && rpc->num_funcs > 0) // need to check something as non-zero.
+        if (rpc /*&& rpc->num_funcs > 0*/) // need to check something as non-zero.
         {
             ioctl(rpc->device, OMAPRPC_IOC_DESTROY, 0);
             close(rpc->device);
@@ -306,6 +306,7 @@ bool_e omaprpc_register(omaprpc_t *rpc, int memdevice, void *ptr, void **reserve
             if (ret < 0)
             {
                 OMAPRPC_PRINT(OMAPRPC_ZONE_ERROR, "Failed to share ION memory! (err=%d)\n", ret);
+                free(data);
             }
             else
             {
@@ -314,6 +315,7 @@ bool_e omaprpc_register(omaprpc_t *rpc, int memdevice, void *ptr, void **reserve
                 {
                     OMAPRPC_PRINT(OMAPRPC_ZONE_ERROR, "Failed to register ION buffer with OMAPRPC:%u! (err=%d)\n", rpc->device, ret);
                     close(data->fd);
+                    free(data);
                 }
                 else
                 {

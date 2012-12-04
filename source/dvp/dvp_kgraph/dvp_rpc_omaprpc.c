@@ -578,9 +578,11 @@ DVP_RPC_t *dvp_rpc_init()
 
 void dvp_rpc_core_deinit(DVP_RPC_t *rpc, DVP_RPC_Core_t **rpcc)
 {
+    if ( rpcc && *rpcc )
+        omaprpc_close(&(*rpcc)->rpc);
+
     if (rpc && rpcc && *rpcc)
     {
-        omaprpc_close(&(*rpcc)->rpc);
         free(*rpcc);
         *rpcc = NULL;
     }
@@ -628,6 +630,7 @@ DVP_RPC_Core_t *dvp_rpc_core_init(DVP_RPC_t *rpc, DVP_RPC_Interface_t *rpci)
         {
             DVP_PRINT(DVP_ZONE_RPC, "DVP_RPC: Interfacing to CORE:%d\n",core);
             rpcc->rpc = omaprpc_open(dvp_core_names[core].device_name, dvp_core_names[core].server_name, rpci->numRemoteFunctions);
+
             if (rpcc->rpc == NULL)
             {
                 status = -1;
@@ -642,7 +645,9 @@ DVP_RPC_Core_t *dvp_rpc_core_init(DVP_RPC_t *rpc, DVP_RPC_Interface_t *rpci)
                 omaprpc_restart_callback(rpcc->rpc, rpcc, dvp_rpc_restart_callback, DVP_MAX_RESTART_RETRY);
             }
             if (status < 0)
+            {
                 goto leave;
+            }
             DVP_PRINT(DVP_ZONE_RPC, "Successfully installed DVP RPC for CORE %d!\n",core);
         }
         else

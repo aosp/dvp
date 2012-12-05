@@ -694,9 +694,9 @@ typedef enum _dvp_knode_e {
      * Converts FOURCC_UYVY format to 3 plane LAB D65 8 bit per pixel color space (VLIB-API.Sec 59.0)\n
      * Configuration Structure: DVP_Int2Pl_t
      * \param [in] input Image color type supported: FOURCC_UYVY
-     * \param [out] output1 Image color type supported: FOURCC_RGBA
-     * \param [out] output2 Image color type supported: FOURCC_RGBA
-     * \param [out] output3 Image color type supported: FOURCC_RGBA
+     * \param [out] output1 Image color type supported: FOURCC_Y16
+     * \param [out] output2 Image color type supported: FOURCC_Y16
+     * \param [out] output3 Image color type supported: FOURCC_Y16
      */
     DVP_KN_UYVY_TO_LABp,
 

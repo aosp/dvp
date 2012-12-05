@@ -4943,7 +4943,8 @@ MODULE_EXPORT DVP_U32 DVP_KernelGraphManagerVerify(DVP_KernelNode_t *pSubNodes,
                 DVP_Nonmax_NxN_t *nonmax32 = dvp_knode_to(&pSubNodes[n], DVP_Nonmax_NxN_t);
                 fourcc_t valid_colors[] = {FOURCC_Y32};
                 if (DVP_Image_Validate(&nonmax32->input, 1, 1, 1, 1, valid_colors, dimof(valid_colors)) == DVP_FALSE ||
-                    DVP_Buffer_Validate(&nonmax32->pixIndex) == DVP_FALSE)
+                    DVP_Buffer_Validate(&nonmax32->pixIndex) == DVP_FALSE ||
+                    DVP_Buffer_Validate(&nonmax32->scratch) == DVP_FALSE)
                     pSubNodes[n].header.error = DVP_ERROR_INVALID_PARAMETER;
                 break;
             }

@@ -5512,14 +5512,14 @@ status_e TestVisionEngine::Test_Imglib()
             DVP_Image_Init(&m_images[35], m_width, m_height, FOURCC_YV16);
             DVP_Image_Init(&m_images[36], m_width, m_height, FOURCC_RGB565);
             DVP_Image_Init(&m_images[37], m_width, m_height, FOURCC_Y16); //clipping
-            DVP_Image_Init(&m_images[38], m_width, m_height, FOURCC_RGBA); //corr 3x3 c8
-            DVP_Image_Init(&m_images[39], m_width, m_height, FOURCC_RGBA); //corr 3x3 c16
-            DVP_Image_Init(&m_images[40], m_width, m_height, FOURCC_RGBA); //corr 3x3 i16
-            DVP_Image_Init(&m_images[41], m_width, m_height, FOURCC_RGBA); //corr 5x5 c16
-            DVP_Image_Init(&m_images[42], m_width, m_height, FOURCC_RGBA); //corr 11x11 c16
-            DVP_Image_Init(&m_images[43], m_width, m_height, FOURCC_RGBA); //corr 11x11 c16
+            DVP_Image_Init(&m_images[38], m_width, m_height, FOURCC_Y32); //corr 3x3 c8
+            DVP_Image_Init(&m_images[39], m_width, m_height, FOURCC_Y32); //corr 3x3 c16
+            DVP_Image_Init(&m_images[40], m_width, m_height, FOURCC_Y32); //corr 3x3 i16
+            DVP_Image_Init(&m_images[41], m_width, m_height, FOURCC_Y32); //corr 5x5 c16
+            DVP_Image_Init(&m_images[42], m_width, m_height, FOURCC_Y32); //corr 11x11 c16
+            DVP_Image_Init(&m_images[43], m_width, m_height, FOURCC_Y32); //corr 11x11 c16
             DVP_Image_Init(&m_images[44], m_width, m_height, FOURCC_Y16); //corr gen c16
-            DVP_Image_Init(&m_images[45], m_width, m_height, FOURCC_RGBA); //corr gen iq
+            DVP_Image_Init(&m_images[45], m_width, m_height, FOURCC_Y32); //corr gen iq
             DVP_Image_Init(&m_images[46], m_width, m_height, FOURCC_Y800); //median 3x3
             DVP_Image_Init(&m_images[47], m_width, m_height, FOURCC_Y16); //median 3x3 16s
             DVP_Image_Init(&m_images[48], m_width, m_height, FOURCC_Y16); //expand

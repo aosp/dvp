@@ -71,6 +71,7 @@ static void *poolmem_buffer(uint32_t pool, uint32_t slot)
     return (void *)&poolmem[offset];
 }
 
+#if defined(SOSAL_DEBUG) && defined(UNITTEST)
 static size_t poolmem_active()
 {
     uint32_t p,s;
@@ -85,6 +86,7 @@ static size_t poolmem_active()
     }
     return active;
 }
+#endif
 
 void *poolmem_alloc(size_t size)
 {
@@ -143,6 +145,7 @@ void poolmem_free(void *ptr)
 
 void poolmem_print()
 {
+#if defined(SOSAL_DEBUG)
     uint32_t p,s;
     for (p = 0; p < dimof(pooldef); p++)
     {
@@ -155,6 +158,7 @@ void poolmem_print()
         }
     }
     SOSAL_PRINT(SOSAL_ZONE_POOLMEM,"pooldef_size()=%zu, poolmem_size=%zu\n",pooldef_size(), sizeof(poolmem));
+#endif
 }
 
 #if defined(UNITTEST)

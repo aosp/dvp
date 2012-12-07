@@ -17,7 +17,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE_TAGS := optional
 LOCAL_PRELINK_MODULE := false
 LOCAL_ARM_MODE := arm
-LOCAL_CFLAGS := $(SOSAL_DEBUGGING) $(SOSAL_CFLAGS)
+LOCAL_CFLAGS := $(SOSAL_DEBUGGING) $(SOSAL_CFLAGS) -DPOOL_MAX_SIZE=0
 LOCAL_SRC_FILES := $(filter-out shared.c unittest.c,$(call all-c-files-under,.))
 LOCAL_C_INCLUDES := $(SOSAL_TOP)/include
 ifeq ($(PLAT_MAJOR),4) # ICS or later

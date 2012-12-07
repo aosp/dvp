@@ -54,6 +54,7 @@
  * \defgroup group_unittest SOSAL Unit Tests
  * \defgroup group_histograms SOSAL Histogram
  * \defgroup group_heaps SOSAL Heaps
+ * \defgroup group_sosal_pool SOSAL Pool Memory
  */
 #include <sosal/types.h>
 #include <sosal/status.h>

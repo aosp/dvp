@@ -15,7 +15,7 @@
 include $(PRELUDE)
 TARGET=sosal
 TARGETTYPE=library
-DEFS += $(SOSAL_FLAGS)
+DEFS += $(SOSAL_FLAGS) POOL_MAX_SIZE=0
 IDIRS += $(SOSAL_INC) $(MEM_INCS)
 ifeq ($(TARGET_OS),DARWIN)
 IDIRS += /Library/Frameworks/CarbonCore/Headers

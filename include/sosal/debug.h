@@ -158,6 +158,7 @@ extern uint32_t sosal_zone_mask;
 
 #define SOSAL_ZONE_MEM        (SOSAL_BIT(24)& SOSAL_ZONE_MASK)
 #define SOSAL_ZONE_TIMER      (SOSAL_BIT(25)& SOSAL_ZONE_MASK)
+#define SOSAL_ZONE_POOLMEM    (SOSAL_BIT(26)& SOSAL_ZONE_MASK)
 
 #define SOSAL_ZONE_EXTRA      (SOSAL_BIT(31)& SOSAL_ZONE_MASK)
 #define SOSAL_ZONE_ALWAYS     (1)

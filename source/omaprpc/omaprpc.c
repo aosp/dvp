@@ -353,9 +353,40 @@ bool_e omaprpc_call(omaprpc_t *rpc, struct omaprpc_call_function_t *function, st
     clock_t start = 0, end = 0, diff = 0;
     bool_e passed = false_e;
     int ret = 0;
+    uint32_t p, t;
     if (rpc && function->func_index < rpc->num_funcs)
     {
         size_t func_len = sizeof(struct omaprpc_call_function_t) + (function->num_translations * sizeof(struct omaprpc_param_translation_t));
+
+        OMAPRPC_PRINT(OMAPRPC_ZONE_API, "Calling function %u\n", function->func_index);
+        for (p = 0; p < function->num_params; p++)
+        {
+            switch (function->params[p].type)
+            {
+                case OMAPRPC_PARAM_TYPE_ATOMIC:
+                    OMAPRPC_PRINT(OMAPRPC_ZONE_API, "ATM: param[%u] = %zu (size = %zu) resv=%zu",
+                        p,
+                        function->params[p].data,
+                        function->params[p].size,
+                        function->params[p].reserved);
+                    break;
+                case OMAPRPC_PARAM_TYPE_PTR:
+                    OMAPRPC_PRINT(OMAPRPC_ZONE_API, "PTR: param[%u] = %p base = %p size = %zu resv = %zu",
+                        p,
+                        function->params[p].data,
+                        function->params[p].base,
+                        function->params[p].size,
+                        function->params[p].reserved);
+                    break;
+                default:
+                    break;
+            }
+        }
+        for (t = 0; t < function->num_translations; t++)
+        {
+            OMAPRPC_PRINT(OMAPRPC_ZONE_API, "trans[%u] for param[%u]\n",
+                t, function->translations[t].index)
+        }
 
         start = clock();
         errno = 0; // reset errno before calling

@@ -293,12 +293,12 @@ DVP_VALUE dvp_rpc_get_handle(DVP_RPC_t *rpc, DVP_PTR ptr);
  * \param [in] trans
  * \ingroup group_dvp_rpc
  */
-int dvp_rpc_remote_execute(DVP_RPC_t *rpc,
-                           DVP_RPC_Core_t *rpcc,
-                           int cliIndex,
-                           DVP_RPC_Parameter_t *params,
-                           DVP_U32 numParams,
-                           DVP_RPC_Translation_t *trans);
+DVP_S32 dvp_rpc_remote_execute(DVP_RPC_t *rpc,
+                               DVP_RPC_Core_t *rpcc,
+                               DVP_U32 cliIndex,
+                               DVP_RPC_Parameter_t *params,
+                               DVP_U32 numParams,
+                               DVP_RPC_Translation_t *trans);
 
 /*! \brief This function invalidates memory from the cache.
  * \param [in] rpc The pointer to the RPC context.

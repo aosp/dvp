@@ -31,6 +31,9 @@ typedef size_t ptrdiff_t;
 #include <linux/omap_rpc.h>
 #endif
 
+/*! Used by clients to help define their remote call enumeration. */
+#define OMAPRPC_REMOTE_FUNC_BASE (0)
+
 // forward definition
 struct _omaprpc_t;
 

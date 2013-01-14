@@ -66,13 +66,13 @@ typedef struct _hash {
 extern "C" {
 #endif
 
-/*! \brief The function which initializes the hash.
+/*! \brief The function which creates the hash.
  * \param [in] size The enumerated size of the bitdepth of the table. 8, 12, or 16.
  * \param [in] keyFunc the pointer to the custom keygen function is one is desired.
  * The default implementation will be used if NULL is given.
  * \ingroup group_hashes
  */
-hash_t *hash_init(hash_size_e size, hash_func_f keyFunc);
+hash_t *hash_create(hash_size_e size, hash_func_f keyFunc);
 
 /*!
  * \brief This function sets a value into the hash using the key.
@@ -119,11 +119,11 @@ size_t hash_length(hash_t *h);
 void hash_print(hash_t *h, bool_e printElems);
 
 /*!
- * \brief Deinitializes the hash.
+ * \brief Destroys the hash.
  * \param [in] h The hash to deinitialize.
  * \ingroup group_hashes
  */
-void hash_deinit(hash_t *h);
+void hash_destroy(hash_t *h);
 
 #ifdef __cplusplus
 }

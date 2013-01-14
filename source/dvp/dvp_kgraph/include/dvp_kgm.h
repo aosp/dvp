@@ -160,13 +160,23 @@ typedef struct _dvp_graph_manager_t {
     DVP_U32                     priority;
 } DVP_GraphManager_t;
 
+#if defined(DVP_USE_OMAPRPC)
+#include <omaprpc/omaprpc.h>
+#define DVP_KGM_FUNC_BASE OMAPRPC_REMOTE_FUNC_BASE
+#else
+#define DVP_KGM_FUNC_BASE (0)
+#endif
+
 /*! \brief These are used as indexes into the Remote DVP KGM.
  * \ingroup group_dvp_kgm
  */
 typedef enum _dvp_kgm_function_e {
-    DVP_KGM_REMOTE_INIT = 0,    /*!< \brief The index to the remote initialization function */
-    DVP_KGM_REMOTE_DEINIT,      /*!< \brief The index to the remote deinitialization function */
-    DVP_KGM_REMOTE_EXEC,        /*!< \brief The index to the remote execution function */
+    /*! \brief The index to the remote initialization function */
+    DVP_KGM_REMOTE_INIT = DVP_KGM_FUNC_BASE,
+    /*! \brief The index to the remote deinitialization function */
+    DVP_KGM_REMOTE_DEINIT,
+    /*! \brief The index to the remote execution function */
+    DVP_KGM_REMOTE_EXEC,
 } DVP_KGM_Remote_Function_e;
 
 /*!< \brief This is used internally to implement a per-core thread model.

@@ -1,4 +1,4 @@
-# Copyright (C) 2011 Texas Insruments, Inc.
+# Copyright (C) 2011 Texas Instruments, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,16 +21,17 @@ HOST_ROOT?=$(abspath .)
 $(info HOST_ROOT=$(HOST_ROOT))
 
 BUILD_FOLDER?=concerto
+CONCERTO_ROOT?=$(HOST_ROOT)/$(BUILD_FOLDER)
 
-include $(HOST_ROOT)/$(BUILD_FOLDER)/os.mak
-include $(HOST_ROOT)/$(BUILD_FOLDER)/machine.mak
-include $(HOST_ROOT)/$(BUILD_FOLDER)/target.mak
-include $(HOST_ROOT)/$(BUILD_FOLDER)/shell.mak
+include $(CONCERTO_ROOT)/os.mak
+include $(CONCERTO_ROOT)/machine.mak
+include $(CONCERTO_ROOT)/target.mak
+include $(CONCERTO_ROOT)/shell.mak
 
 # Define the prelude and finale files so that SUBMAKEFILEs know what they are
 # And if the users go and make -f concerto.mak then it will not work right.
-PRELUDE := $(HOST_ROOT)/$(BUILD_FOLDER)/prelude.mak
-FINALE  := $(HOST_ROOT)/$(BUILD_FOLDER)/finale.mak
+PRELUDE := $(CONCERTO_ROOT)/prelude.mak
+FINALE  := $(CONCERTO_ROOT)/finale.mak
 SUBMAKEFILE := concerto.mak
 
 # Remove the implicit rules for compiling.

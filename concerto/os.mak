@@ -52,10 +52,11 @@ else
 endif
 
 ifeq ($(HOST_OS),Windows_NT)
-    PATH_CONV=$(subst /,\,$(1)) 
+    PATH_CONV=$(subst /,\,$(1))
 else
     PATH_CONV=$(subst _,_,$(1))
 endif
 
 $(info HOST_OS=$(HOST_OS))
 $(info HOST_COMPILER=$(HOST_COMPILER))
+

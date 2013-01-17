@@ -51,7 +51,7 @@ else
     else ifeq ($(HOST_CPU),armv7l)
         HOST_CPU=ARM
         HOST_ARCH=32
-        endif
+    endif
 endif
 
 $(info HOST_CPU=$(HOST_CPU))

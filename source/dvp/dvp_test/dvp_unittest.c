@@ -1608,7 +1608,7 @@ status_e dvp_imageshift_test(void)
 }
 
 
-inline void create_dvp_image(DVP_Handle *dvp, DVP_Image_t **pImage, DVP_U32 img_width, DVP_U32 img_height, fourcc_t fourcc)
+void create_dvp_image(DVP_Handle *dvp, DVP_Image_t **pImage, DVP_U32 img_width, DVP_U32 img_height, fourcc_t fourcc)
 {
     *dvp = DVP_KernelGraph_Init();
     if( *dvp )
@@ -1630,7 +1630,7 @@ inline void create_dvp_image(DVP_Handle *dvp, DVP_Image_t **pImage, DVP_U32 img_
     }
 }
 
-inline void destroy_dvp_image(DVP_Handle *dvp, DVP_Image_t *pImage )
+void destroy_dvp_image(DVP_Handle *dvp, DVP_Image_t *pImage )
 {
     if( *dvp )
     {
@@ -1740,7 +1740,7 @@ status_e dvp_image_height_div_test(void)
     return status;
 }
 
-inline DVP_U32 dvp_test_image_width_step(DVP_Image_t *pImage, DVP_U32 plane)
+DVP_U32 dvp_test_image_width_step(DVP_Image_t *pImage, DVP_U32 plane)
 {
     DVP_U32 step = 1;
     if (pImage && plane < pImage->planes && plane > 0)

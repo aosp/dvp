@@ -1,4 +1,4 @@
-# Copyright (C) 2011 Texas Insruments, Inc.
+# Copyright (C) 2011 Texas Instruments, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -52,30 +52,29 @@ else ifeq ($($(_MODULE)_TYPE),exe)
 	NEEDS_COMPILER=1
 endif
 
-include $(HOST_ROOT)/$(BUILD_FOLDER)/opencl.mak
-
 ifeq ($(NEEDS_COMPILER),1)
 
 ifeq ($(HOST_COMPILER),GCC)
-	include $(HOST_ROOT)/$(BUILD_FOLDER)/gcc.mak
+	include $(CONCERTO_ROOT)/gcc.mak
 else ifeq ($(HOST_COMPILER),CLANG)
-	include $(HOST_ROOT)/$(BUILD_FOLDER)/clang.mak
+	include $(CONCERTO_ROOT)/clang.mak
 else ifeq ($(HOST_COMPILER),CL)
-	include $(HOST_ROOT)/$(BUILD_FOLDER)/cl.mak
+	include $(CONCERTO_ROOT)/cl.mak
 else ifeq ($(HOST_COMPILER),CGT6X)
-	include $(HOST_ROOT)/$(BUILD_FOLDER)/cgt6x.mak
+	include $(CONCERTO_ROOT)/cgt6x.mak
 else ifeq ($(HOST_COMPILER),QCC)
-	include $(HOST_ROOT)/$(BUILD_FOLDER)/qcc.mak
+	include $(CONCERTO_ROOT)/qcc.mak
 else ifeq ($(HOST_COMPILER),TMS470)
-	include $(HOST_ROOT)/$(BUILD_FOLDER)/tms470.mak
+	include $(CONCERTO_ROOT)/tms470.mak
 endif
 
-include $(HOST_ROOT)/$(BUILD_FOLDER)/java.mak
+include $(CONCERTO_ROOT)/java.mak
 
 endif
 
-include $(HOST_ROOT)/$(BUILD_FOLDER)/dpkg.mak
-include $(HOST_ROOT)/$(BUILD_FOLDER)/doxygen.mak
+include $(CONCERTO_ROOT)/opencl.mak
+include $(CONCERTO_ROOT)/dpkg.mak
+include $(CONCERTO_ROOT)/doxygen.mak
 
 else
 
@@ -154,7 +153,6 @@ $(eval $(call $(_MODULE)_PACKAGE))
 
 else ifeq ($(strip $($(_MODULE)_TYPE)),doxygen)
 
-$(info Creating doxygen rules!)
 $(eval $(call $(_MODULE)_DOCUMENTS))
 
 endif

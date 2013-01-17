@@ -13,18 +13,18 @@
 # limitations under the License.
 
 ifeq ($(TARGET_CPU),$(HOST_CPU))
-	CROSS_COMPILE=
+	CROSS_COMPILE:=
 endif
 
 ifeq ($(TARGET_CPU),X86)
-	CROSS_COMPILE=
+	CROSS_COMPILE:=
 endif
 
 CC = $(CROSS_COMPILE)gcc
 CP = $(CROSS_COMPILE)g++
 AS = $(CROSS_COMPILE)as
 AR = $(CROSS_COMPILE)ar
-LD = $(CROSS_COMPILE)gcc
+LD = $(CROSS_COMPILE)g++
 
 ifdef LOGFILE
 LOGGING:=&>$(LOGFILE)

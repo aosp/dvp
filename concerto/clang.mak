@@ -64,7 +64,7 @@ $(_MODULE)_LOPT := $(LDFLAGS)
 ifneq ($(TARGET_OS),CYGWIN)
 $(_MODULE)_COPT += -fPIC
 endif
-$(_MODULE)_COPT += -Wno-deprecated
+$(_MODULE)_COPT += -Wno-write-strings
 
 ifeq ($(TARGET_BUILD),debug)
 $(_MODULE)_COPT += -O0 -ggdb3
@@ -225,7 +225,6 @@ endef
 
 define $(_MODULE)_BUILD
 build:: $($(_MODULE)_BIN)
-	@echo Building for $($(_MODULE)_BIN)
 endef
 
 define $(_MODULE)_CLEAN_LNK

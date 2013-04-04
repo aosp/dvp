@@ -974,6 +974,25 @@ static DVP_U32 DVP_KernelGraphManager_DSP(DVP_KernelNode_t *pNodes, DVP_U32 star
                     dvp_rpc_prepare_buffer(rpc, DVP_GetSupportedRemoteCore(), &pNonmax32->pixIndex, DVP_FALSE, (DVP_PTR)pTmp, &translations);
                     break;
                 }
+                case DVP_KN_VLIB_KALMAN_2x4:
+                case DVP_KN_VLIB_KALMAN_4x6:
+                {
+                    DVP_KalmanFilter_t *pKf = dvp_knode_to(&pNodes[n], DVP_KalmanFilter_t);
+                    dvp_rpc_prepare_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->inMeasurements, DVP_FALSE, (DVP_PTR)pTmp, &translations);
+                    dvp_rpc_prepare_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->transition, DVP_FALSE, (DVP_PTR)pTmp, &translations);
+                    dvp_rpc_prepare_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->errorCov, DVP_FALSE, (DVP_PTR)pTmp, &translations);
+                    dvp_rpc_prepare_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->predictedErrorCov, DVP_FALSE, (DVP_PTR)pTmp, &translations);
+                    dvp_rpc_prepare_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->state, DVP_FALSE, (DVP_PTR)pTmp, &translations);
+                    dvp_rpc_prepare_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->predictedState, DVP_FALSE, (DVP_PTR)pTmp, &translations);
+                    dvp_rpc_prepare_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->measurement, DVP_FALSE, (DVP_PTR)pTmp, &translations);
+                    dvp_rpc_prepare_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->processNoiseCov, DVP_FALSE, (DVP_PTR)pTmp, &translations);
+                    dvp_rpc_prepare_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->measurementNoiseCov, DVP_FALSE, (DVP_PTR)pTmp, &translations);
+                    dvp_rpc_prepare_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->kalmanGain, DVP_FALSE, (DVP_PTR)pTmp, &translations);
+                    dvp_rpc_prepare_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->temp1, DVP_FALSE, (DVP_PTR)pTmp, &translations);
+                    dvp_rpc_prepare_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->temp2, DVP_FALSE, (DVP_PTR)pTmp, &translations);
+                    dvp_rpc_prepare_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->temp3, DVP_FALSE, (DVP_PTR)pTmp, &translations);
+                    break;
+                }
 #endif
 #ifdef DVP_USE_TISMO
                 case DVP_KN_TISMO_DISPARITY:
@@ -1217,25 +1236,6 @@ static DVP_U32 DVP_KernelGraphManager_DSP(DVP_KernelNode_t *pNodes, DVP_U32 star
                     dvp_rpc_prepare_buffer(rpc, DVP_GetSupportedRemoteCore(), &pWv->qmf, DVP_TRUE, (DVP_PTR)pTmp, &translations);
                     dvp_rpc_prepare_buffer(rpc, DVP_GetSupportedRemoteCore(), &pWv->mqmf, DVP_TRUE, (DVP_PTR)pTmp, &translations);
                     dvp_rpc_prepare_image(rpc, DVP_GetSupportedRemoteCore(), &pWv->output, DVP_FALSE, (DVP_PTR)pTmp, &translations);
-                    break;
-                }
-                case DVP_KN_VLIB_KALMAN_2x4:
-                case DVP_KN_VLIB_KALMAN_4x6:
-                {
-                    DVP_KalmanFilter_t *pKf = dvp_knode_to(&pNodes[n], DVP_KalmanFilter_t);
-                    dvp_rpc_prepare_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->inMeasurements, DVP_FALSE, (DVP_PTR)pTmp, &translations);
-                    dvp_rpc_prepare_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->transition, DVP_FALSE, (DVP_PTR)pTmp, &translations);
-                    dvp_rpc_prepare_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->errorCov, DVP_FALSE, (DVP_PTR)pTmp, &translations);
-                    dvp_rpc_prepare_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->predictedErrorCov, DVP_FALSE, (DVP_PTR)pTmp, &translations);
-                    dvp_rpc_prepare_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->state, DVP_FALSE, (DVP_PTR)pTmp, &translations);
-                    dvp_rpc_prepare_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->predictedState, DVP_FALSE, (DVP_PTR)pTmp, &translations);
-                    dvp_rpc_prepare_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->measurement, DVP_FALSE, (DVP_PTR)pTmp, &translations);
-                    dvp_rpc_prepare_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->processNoiseCov, DVP_FALSE, (DVP_PTR)pTmp, &translations);
-                    dvp_rpc_prepare_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->measurementNoiseCov, DVP_FALSE, (DVP_PTR)pTmp, &translations);
-                    dvp_rpc_prepare_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->kalmanGain, DVP_FALSE, (DVP_PTR)pTmp, &translations);
-                    dvp_rpc_prepare_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->temp1, DVP_FALSE, (DVP_PTR)pTmp, &translations);
-                    dvp_rpc_prepare_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->temp2, DVP_FALSE, (DVP_PTR)pTmp, &translations);
-                    dvp_rpc_prepare_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->temp3, DVP_FALSE, (DVP_PTR)pTmp, &translations);
                     break;
                 }
 #endif
@@ -1972,7 +1972,25 @@ static DVP_U32 DVP_KernelGraphManager_DSP(DVP_KernelNode_t *pNodes, DVP_U32 star
                     dvp_rpc_return_buffer(rpc, DVP_GetSupportedRemoteCore(), &pNonmax32->pixIndex, DVP_TRUE);
                     break;
                 }
-
+                case DVP_KN_VLIB_KALMAN_2x4:
+                case DVP_KN_VLIB_KALMAN_4x6:
+                {
+                    DVP_KalmanFilter_t *pKf = dvp_knode_to(&pNodes[n], DVP_KalmanFilter_t);
+                    dvp_rpc_return_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->inMeasurements, DVP_TRUE);
+                    dvp_rpc_return_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->transition, DVP_TRUE);
+                    dvp_rpc_return_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->errorCov, DVP_TRUE);
+                    dvp_rpc_return_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->predictedErrorCov, DVP_TRUE);
+                    dvp_rpc_return_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->state, DVP_TRUE);
+                    dvp_rpc_return_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->predictedState, DVP_TRUE);
+                    dvp_rpc_return_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->measurement, DVP_TRUE);
+                    dvp_rpc_return_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->processNoiseCov, DVP_TRUE);
+                    dvp_rpc_return_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->measurementNoiseCov, DVP_TRUE);
+                    dvp_rpc_return_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->kalmanGain, DVP_TRUE);
+                    dvp_rpc_return_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->temp1, DVP_TRUE);
+                    dvp_rpc_return_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->temp2, DVP_TRUE);
+                    dvp_rpc_return_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->temp3, DVP_TRUE);
+                    break;
+                }
 #endif
 #ifdef DVP_USE_TISMO
                 case DVP_KN_TISMO_DISPARITY:
@@ -2196,25 +2214,6 @@ static DVP_U32 DVP_KernelGraphManager_DSP(DVP_KernelNode_t *pNodes, DVP_U32 star
                     dvp_rpc_return_buffer(rpc, DVP_GetSupportedRemoteCore(), &pWv->qmf, DVP_FALSE);
                     dvp_rpc_return_buffer(rpc, DVP_GetSupportedRemoteCore(), &pWv->mqmf, DVP_FALSE);
                     dvp_rpc_return_image(rpc, DVP_GetSupportedRemoteCore(), &pWv->output, DVP_TRUE);
-                    break;
-                }
-                case DVP_KN_VLIB_KALMAN_2x4:
-                case DVP_KN_VLIB_KALMAN_4x6:
-                {
-                    DVP_KalmanFilter_t *pKf = dvp_knode_to(&pNodes[n], DVP_KalmanFilter_t);
-                    dvp_rpc_return_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->inMeasurements, DVP_TRUE);
-                    dvp_rpc_return_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->transition, DVP_TRUE);
-                    dvp_rpc_return_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->errorCov, DVP_TRUE);
-                    dvp_rpc_return_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->predictedErrorCov, DVP_TRUE);
-                    dvp_rpc_return_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->state, DVP_TRUE);
-                    dvp_rpc_return_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->predictedState, DVP_TRUE);
-                    dvp_rpc_return_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->measurement, DVP_TRUE);
-                    dvp_rpc_return_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->processNoiseCov, DVP_TRUE);
-                    dvp_rpc_return_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->measurementNoiseCov, DVP_TRUE);
-                    dvp_rpc_return_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->kalmanGain, DVP_TRUE);
-                    dvp_rpc_return_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->temp1, DVP_TRUE);
-                    dvp_rpc_return_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->temp2, DVP_TRUE);
-                    dvp_rpc_return_buffer(rpc, DVP_GetSupportedRemoteCore(), &pKf->temp3, DVP_TRUE);
                     break;
                 }
 #endif
@@ -3381,6 +3380,26 @@ MODULE_EXPORT DVP_U32 DVP_KernelGraphManagerVerify(DVP_KernelNode_t *pNodes,
                     pNodes[n].header.error = DVP_ERROR_INVALID_PARAMETER;
                 break;
             }
+            case DVP_KN_VLIB_KALMAN_2x4:
+            case DVP_KN_VLIB_KALMAN_4x6:
+            {
+                DVP_KalmanFilter_t *pKf = dvp_knode_to(&pNodes[n], DVP_KalmanFilter_t);
+                if (DVP_Buffer_Validate(&pKf->inMeasurements) == DVP_FALSE ||
+                    DVP_Buffer_Validate(&pKf->transition) == DVP_FALSE ||
+                    DVP_Buffer_Validate(&pKf->errorCov) == DVP_FALSE ||
+                    DVP_Buffer_Validate(&pKf->predictedErrorCov) == DVP_FALSE ||
+                    DVP_Buffer_Validate(&pKf->state) == DVP_FALSE ||
+                    DVP_Buffer_Validate(&pKf->predictedState) == DVP_FALSE ||
+                    DVP_Buffer_Validate(&pKf->measurement) == DVP_FALSE ||
+                    DVP_Buffer_Validate(&pKf->processNoiseCov) == DVP_FALSE ||
+                    DVP_Buffer_Validate(&pKf->measurementNoiseCov) == DVP_FALSE ||
+                    DVP_Buffer_Validate(&pKf->kalmanGain) == DVP_FALSE ||
+                    DVP_Buffer_Validate(&pKf->temp1) == DVP_FALSE ||
+                    DVP_Buffer_Validate(&pKf->temp2) == DVP_FALSE ||
+                    DVP_Buffer_Validate(&pKf->temp3) == DVP_FALSE)
+                    pNodes[n].header.error = DVP_ERROR_INVALID_PARAMETER;
+                break;
+            }
 #endif
 #ifdef DVP_USE_TISMO
             case DVP_KN_TISMO_DISPARITY:
@@ -3818,26 +3837,6 @@ MODULE_EXPORT DVP_U32 DVP_KernelGraphManagerVerify(DVP_KernelNode_t *pNodes,
                     DVP_Buffer_Validate(&pWv->mqmf) == DVP_FALSE ||
                     pWv->input.width > pWv->output.width ||
                     pWv->input.height > pWv->output.height)
-                    pNodes[n].header.error = DVP_ERROR_INVALID_PARAMETER;
-                break;
-            }
-            case DVP_KN_VLIB_KALMAN_2x4:
-            case DVP_KN_VLIB_KALMAN_4x6:
-            {
-                DVP_KalmanFilter_t *pKf = dvp_knode_to(&pNodes[n], DVP_KalmanFilter_t);
-                if (DVP_Buffer_Validate(&pKf->inMeasurements) == DVP_FALSE ||
-                    DVP_Buffer_Validate(&pKf->transition) == DVP_FALSE ||
-                    DVP_Buffer_Validate(&pKf->errorCov) == DVP_FALSE ||
-                    DVP_Buffer_Validate(&pKf->predictedErrorCov) == DVP_FALSE ||
-                    DVP_Buffer_Validate(&pKf->state) == DVP_FALSE ||
-                    DVP_Buffer_Validate(&pKf->predictedState) == DVP_FALSE ||
-                    DVP_Buffer_Validate(&pKf->measurement) == DVP_FALSE ||
-                    DVP_Buffer_Validate(&pKf->processNoiseCov) == DVP_FALSE ||
-                    DVP_Buffer_Validate(&pKf->measurementNoiseCov) == DVP_FALSE ||
-                    DVP_Buffer_Validate(&pKf->kalmanGain) == DVP_FALSE ||
-                    DVP_Buffer_Validate(&pKf->temp1) == DVP_FALSE ||
-                    DVP_Buffer_Validate(&pKf->temp2) == DVP_FALSE ||
-                    DVP_Buffer_Validate(&pKf->temp3) == DVP_FALSE)
                     pNodes[n].header.error = DVP_ERROR_INVALID_PARAMETER;
                 break;
             }

@@ -3006,8 +3006,7 @@ static DVP_U32 DVP_KernelGraphManager_CPU(DVP_KernelNode_t *pSubNodes, DVP_U32 s
                                     color,
                                     pT->lut.pData,
                                     (uint8_t *)scratch,
-                                    scratchSize,
-                                    0);
+                                    scratchSize);
                         free(scratch);
                     }
                     else
